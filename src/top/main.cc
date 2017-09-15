@@ -6,11 +6,16 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/LaserScan.h>
+
 #include "laser_geometry/laser_geometry.h"
 
 #include "BagReader.h"
 
 #include "../sensor/odometry_data.h"
+#include "sensor_bridge.h"
+#include "msg_conversion.h"
+
 
 
 
@@ -50,11 +55,24 @@ int main(int argc, char **argv)
 	auto pairData = bagReader.mPairData;
 
 
-	int c = 0;
+	//int c = 0;
 	for (auto a : pairData)
 	{
-		//sm.GimmicScanCallback(a.first, a.second);
-		printf("%d\n",c++);
+		
+		::cartographer_ros::SensorBridge sensor_bridge;
+		auto podom = boost::make_shared<const ::nav_msgs::Odometry>(a.second);
+		auto pscan = boost::make_shared<const ::sensor_msgs::LaserScan>(a.first);
+		
+		//const sensor_msgs::LaserScan_<std::allocator<void> >&}’ from expression of type ‘boost::shared_ptr<const sensor_msgs::LaserScan_<std::allocator<void> > >’
+
+		
+		auto odom_data = sensor_bridge.ToOdometryData(podom);
+		auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(a.first);
+
+		for(auto m:scan_data.points){
+			std::cout<<m<<std::endl;
+		}
+		//std::cout<<scan_data.points<<std::endl;
 	}
 	return 0;
 }

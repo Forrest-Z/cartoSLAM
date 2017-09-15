@@ -25,7 +25,7 @@ include_directories(${PROJECT_BINARY_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 
-file(GLOB_RECURSE ALL_SRCS "*.cc" "*.h")
+file(GLOB_RECURSE ALL_SRCS "*.cc")
 file(GLOB_RECURSE ALL_EXECUTABLES "*main.cc")
 
 list(REMOVE_ITEM ALL_SRCS ${ALL_EXECUTABLES})
@@ -61,7 +61,9 @@ endforeach()
 #${PROTOBUF_LIBRARY}
 #)
 
-add_executable(${PROJECT_NAME}  ${ALL_EXECUTABLES} ${ALL_PROTO_SRCS})
+message(STATUS  ${ALL_SRCS} )
+
+add_executable(${PROJECT_NAME}  ${ALL_SRCS} ${ALL_EXECUTABLES} ${ALL_PROTO_SRCS})
 
 add_definitions(${PCL_DEFINITIONS})
 

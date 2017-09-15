@@ -19,12 +19,7 @@
 
 #include <memory>
 
-#include "cartographer/mapping/trajectory_builder.h"
-#include "cartographer/sensor/imu_data.h"
-#include "cartographer/sensor/odometry_data.h"
-#include "cartographer/transform/rigid_transform.h"
-#include "cartographer/transform/transform.h"
-#include "cartographer_ros/tf_bridge.h"
+#include "../sensor/odometry_data.h"
 #include "geometry_msgs/Transform.h"
 #include "geometry_msgs/TransformStamped.h"
 #include "nav_msgs/OccupancyGrid.h"
@@ -45,6 +40,7 @@ class SensorBridge {
   SensorBridge& operator=(const SensorBridge&) = delete;
 
   std::unique_ptr<::cartographer::sensor::OdometryData> ToOdometryData(const nav_msgs::Odometry::ConstPtr& msg);
+  
 };
 
 }  // namespace cartographer_ros

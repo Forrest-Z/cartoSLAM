@@ -29,7 +29,7 @@ proto::OdometryData ToProto(const OdometryData& odometry_data) {
 }
 
 OdometryData FromProto(const proto::OdometryData& proto) {
-  return OdometryData{odometry_data.time,
+  return OdometryData{proto.timestamp(),
                       transform::ToRigid3(proto.pose())};
 }
 

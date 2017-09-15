@@ -21,9 +21,9 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "cartographer/common/math.h"
-#include "cartographer/transform/proto/transform.pb.h"
-#include "cartographer/transform/rigid_transform.h"
+#include "../common/math.h"
+#include "src/transform/proto/transform.pb.h"
+#include "rigid_transform.h"
 
 namespace cartographer {
 namespace transform {

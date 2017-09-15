@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "cartographer/transform/transform.h"
+#include "transform.h"
 
 namespace cartographer {
 namespace transform {
