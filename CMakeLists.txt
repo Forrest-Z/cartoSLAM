@@ -13,7 +13,9 @@ find_package(Ceres REQUIRED COMPONENTS SparseLinearAlgebraLibrary)
 find_package(Eigen3 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(PCL 1.2 REQUIRED)
+find_package(Lua REQUIRED) 
 find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs  message_filters laser_geometry  rosbag)
+
 
 #catkin_package(
 #    INCLUDE_DIRS
@@ -24,7 +26,10 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${LUA_INCLUDE_DIR})
 
+#message(FATAL_ERROR  ${LUA_INCLUDE_DIR})
 file(GLOB_RECURSE ALL_SRCS "*.cc")
 file(GLOB_RECURSE ALL_EXECUTABLES "*main.cc")
 
@@ -61,7 +66,7 @@ endforeach()
 #${PROTOBUF_LIBRARY}
 #)
 
-message(STATUS  ${ALL_SRCS} )
+#message(STATUS  ${ALL_SRCS} )
 
 add_executable(${PROJECT_NAME}  ${ALL_SRCS} ${ALL_EXECUTABLES} ${ALL_PROTO_SRCS})
 
@@ -72,6 +77,8 @@ target_link_libraries(${PROJECT_NAME}
 ${catkin_LIBRARIES}
 ${Boost_LIBRARIES}
 ${PROTOBUF_LIBRARY}
+${LUA_LIBRARIES}
+glog
 )
 
 

@@ -18,6 +18,11 @@
 
 
 
+#include "../mapping/global_trajectory_builder.h"
+#include "../mapping/probability_grid.h"
+
+
+
 
 /*
 class SampleCartoNode
@@ -51,27 +56,27 @@ int main(int argc, char **argv)
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "hector_slam");
-	BagReader bagReader("/home/liu/tokyo_bag/lg_2.bag","/scan","/odom",0, 3000);
+	BagReader bagReader("/home/liu/h1.bag","scan","odom",0, 3000);
 	auto pairData = bagReader.mPairData;
-
-
+	::cartographer_ros::SensorBridge sensor_bridge;
+	//::cartographer::mapping::GlobalTrajectoryBuilder gtb;
 	//int c = 0;
 	for (auto a : pairData)
 	{
 		
-		::cartographer_ros::SensorBridge sensor_bridge;
 		auto podom = boost::make_shared<const ::nav_msgs::Odometry>(a.second);
 		auto pscan = boost::make_shared<const ::sensor_msgs::LaserScan>(a.first);
 		
 		//const sensor_msgs::LaserScan_<std::allocator<void> >&}’ from expression of type ‘boost::shared_ptr<const sensor_msgs::LaserScan_<std::allocator<void> > >’
 
 		
-		auto odom_data = sensor_bridge.ToOdometryData(podom);
-		auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(a.first);
+		sensor_bridge.HandleOdometryMessage(podom);
+		sensor_bridge.HandleLaserScanMessage(pscan);
+		//auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(a.first);
 
-		for(auto m:scan_data.points){
-			std::cout<<m<<std::endl;
-		}
+		//for(auto m:scan_data.points){
+		//	std::cout<<m<<std::endl;
+		//}
 		//std::cout<<scan_data.points<<std::endl;
 	}
 	return 0;

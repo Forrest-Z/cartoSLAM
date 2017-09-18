@@ -39,8 +39,12 @@ class SensorBridge {
   SensorBridge(const SensorBridge&) = delete;
   SensorBridge& operator=(const SensorBridge&) = delete;
 
-  std::unique_ptr<::cartographer::sensor::OdometryData> ToOdometryData(const nav_msgs::Odometry::ConstPtr& msg);
+  std::unique_ptr<::cartographer::sensor::OdometryData> ToOdometryData(const nav_msgs::Odometry::ConstPtr &msg);
   
+  void HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr &msg);
+  void HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr& msg);
+
+
 };
 
 }  // namespace cartographer_ros

@@ -34,6 +34,23 @@ std::unique_ptr<::cartographer::sensor::OdometryData> SensorBridge::ToOdometryDa
     return ::cartographer::common::make_unique<::cartographer::sensor::OdometryData>
             (::cartographer::sensor::OdometryData{time, ToRigid3d(msg->pose.pose)});
 }
+
+void SensorBridge::HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr &msg)
+{
+    auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(*msg);
+    //HandleLaserScan(sensor_id, FromRos(msg->header.stamp), msg->header.frame_id,ToPointCloudWithIntensities(*msg).points,msg->time_increment);
+}
+
+void SensorBridge::HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr& msg) {
+  auto odom_data = ToOdometryData(msg);
+  //if (odometry_data != nullptr) {
+  //  trajectory_builder_->AddOdometerData(sensor_id, odometry_data->time,
+  //                                       odometry_data->pose);
+  //}
+}
+
+
+
 /*
 void SensorBridge::HandleOdometryMessage(const string &sensor_id, const nav_msgs::Odometry::ConstPtr &msg)
 {
