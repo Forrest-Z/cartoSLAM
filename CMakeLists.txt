@@ -28,7 +28,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${LUA_INCLUDE_DIR})
-
+include_directories(${CERES_INCLUDE_DIRS})
 #message(FATAL_ERROR  ${LUA_INCLUDE_DIR})
 file(GLOB_RECURSE ALL_SRCS "*.cc")
 file(GLOB_RECURSE ALL_EXECUTABLES "*main.cc")
@@ -78,6 +78,7 @@ ${catkin_LIBRARIES}
 ${Boost_LIBRARIES}
 ${PROTOBUF_LIBRARY}
 ${LUA_LIBRARIES}
+${CERES_LIBRARIES}
 glog
 )
 
