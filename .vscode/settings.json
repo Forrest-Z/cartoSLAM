@@ -37,6 +37,11 @@
         "*.ipp": "cpp",
         "memory": "cpp",
         "geometry": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "eigenvalues": "cpp",
+        "vector": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp",
+        "system_error": "cpp"
     }
 }

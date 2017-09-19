@@ -13,8 +13,12 @@ find_package(Ceres REQUIRED COMPONENTS SparseLinearAlgebraLibrary)
 find_package(Eigen3 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(PCL 1.2 REQUIRED)
-find_package(Lua REQUIRED) 
+#find_package(Lua REQUIRED)
+set(LUA_INCLUDE_DIR "/usr/local/include/")
+set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
+
 find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs  message_filters laser_geometry  rosbag)
+
 
 
 #catkin_package(
@@ -22,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs  message_filters laser_g
 #    CATKIN_DEPENDS roscpp nav_msgs  message_filters laser_geometry  rosbag
 #    DEPENDS EIGEN3
 #  )
+
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
@@ -29,7 +34,6 @@ include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${LUA_INCLUDE_DIR})
 include_directories(${CERES_INCLUDE_DIRS})
-#message(FATAL_ERROR  ${LUA_INCLUDE_DIR})
 file(GLOB_RECURSE ALL_SRCS "*.cc")
 file(GLOB_RECURSE ALL_EXECUTABLES "*main.cc")
 
@@ -72,14 +76,16 @@ add_executable(${PROJECT_NAME}  ${ALL_SRCS} ${ALL_EXECUTABLES} ${ALL_PROTO_SRCS}
 
 add_definitions(${PCL_DEFINITIONS})
 
+#message(FATAL_ERROR ${LUA_LIBRARIES})
 
 target_link_libraries(${PROJECT_NAME}
+${LUA_LIBRARIES}
 ${catkin_LIBRARIES}
 ${Boost_LIBRARIES}
 ${PROTOBUF_LIBRARY}
-${LUA_LIBRARIES}
 ${CERES_LIBRARIES}
 glog
+dl
 )
 
 

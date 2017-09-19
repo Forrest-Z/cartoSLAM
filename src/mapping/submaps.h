@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef CARTOGRAPHER_MAPPING_2D_SUBMAPS_H_
-#define CARTOGRAPHER_MAPPING_2D_SUBMAPS_H_
+#ifndef CARTOGRAPHER_mapping_SUBMAPS_H_
+#define CARTOGRAPHER_mapping_SUBMAPS_H_
 
 #include <memory>
 #include <vector>
@@ -144,4 +144,4 @@ class ActiveSubmaps
 } // namespace mapping
 } // namespace cartographer
 
-#endif // CARTOGRAPHER_MAPPING_2D_SUBMAPS_H_
+#endif // CARTOGRAPHER_mapping_SUBMAPS_H_

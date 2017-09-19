@@ -22,8 +22,8 @@
 // precomputation done for a given map. However, this map is immutable after
 // construction.
 
-#ifndef CARTOGRAPHER_MAPPING_2D_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_
-#define CARTOGRAPHER_MAPPING_2D_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_
+#ifndef CARTOGRAPHER_mapping_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_
+#define CARTOGRAPHER_mapping_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_
 
 #include <memory>
 #include <vector>
@@ -153,4 +153,4 @@ class FastCorrelativeScanMatcher {
 }  // namespace mapping
 }  // namespace cartographer
 
-#endif  // CARTOGRAPHER_MAPPING_2D_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_
+#endif  // CARTOGRAPHER_mapping_SCAN_MATCHING_FAST_CORRELATIVE_SCAN_MATCHER_H_

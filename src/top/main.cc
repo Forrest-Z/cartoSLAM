@@ -18,9 +18,11 @@
 
 
 
-#include "../mapping/global_trajectory_builder.h"
-#include "../mapping/probability_grid.h"
+#include "../mapping/local_trajectory_builder_options.h"
 
+#include "../common/make_unique.h"
+
+#include "../mapping/local_trajectory_builder.h"
 
 
 
@@ -56,11 +58,12 @@ int main(int argc, char **argv)
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "hector_slam");
-	BagReader bagReader("/home/liu/h1.bag","scan","odom",0, 3000);
+	BagReader bagReader("/home/liu/tokyo_bag/lg_1.bag","/scan","/odom",0, 3000);
 	auto pairData = bagReader.mPairData;
 	::cartographer_ros::SensorBridge sensor_bridge;
-	//::cartographer::mapping::GlobalTrajectoryBuilder gtb;
-	//int c = 0;
+
+	auto p_local_trajectory_builder = ::cartographer::common::make_unique<::cartographer::mapping::LocalTrajectoryBuilder>(::cartographer::mapping::CreateLocalTrajectoryBuilderOptions());  
+	
 	for (auto a : pairData)
 	{
 		

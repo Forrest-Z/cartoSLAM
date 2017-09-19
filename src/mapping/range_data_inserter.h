@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef CARTOGRAPHER_MAPPING_2D_RANGE_DATA_INSERTER_H_
-#define CARTOGRAPHER_MAPPING_2D_RANGE_DATA_INSERTER_H_
+#ifndef CARTOGRAPHER_mapping_RANGE_DATA_INSERTER_H_
+#define CARTOGRAPHER_mapping_RANGE_DATA_INSERTER_H_
 
 #include <utility>
 #include <vector>
@@ -54,4 +54,4 @@ class RangeDataInserter {
 }  // namespace mapping
 }  // namespace cartographer
 
-#endif  // CARTOGRAPHER_MAPPING_2D_RANGE_DATA_INSERTER_H_
+#endif  // CARTOGRAPHER_mapping_RANGE_DATA_INSERTER_H_

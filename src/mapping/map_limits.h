@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef CARTOGRAPHER_MAPPING_2D_MAP_LIMITS_H_
-#define CARTOGRAPHER_MAPPING_2D_MAP_LIMITS_H_
+#ifndef CARTOGRAPHER_mapping_MAP_LIMITS_H_
+#define CARTOGRAPHER_mapping_MAP_LIMITS_H_
 
 #include <utility>
 #include <vector>
@@ -100,4 +100,4 @@ inline proto::MapLimits ToProto(const MapLimits& map_limits) {
 }  // namespace mapping
 }  // namespace cartographer
 
-#endif  // CARTOGRAPHER_MAPPING_2D_MAP_LIMITS_H_
+#endif  // CARTOGRAPHER_mapping_MAP_LIMITS_H_

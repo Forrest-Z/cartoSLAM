@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef CARTOGRAPHER_mapping_RAY_CASTING_H_
-#define CARTOGRAPHER_mapping_RAY_CASTING_H_
+#ifndef CARTOGRAPHER_COMMON_HISTOGRAM_H_
+#define CARTOGRAPHER_COMMON_HISTOGRAM_H_
 
+#include <string>
 #include <vector>
 
 #include "../common/port.h"
-#include "../mapping/probability_grid.h"
-#include "../sensor/point_cloud.h"
-#include "../sensor/range_data.h"
-#include "../transform/transform.h"
 
 namespace cartographer {
-namespace mapping {
+namespace common {
 
-// For each ray in 'range_data', inserts hits and misses into
-// 'probability_grid'. Hits are handled before misses.
-void CastRays(const sensor::RangeData& range_data,
-              const std::vector<uint16>& hit_table,
-              const std::vector<uint16>& miss_table, bool insert_free_space,
-              ProbabilityGrid* probability_grid);
+class Histogram {
+ public:
+  void Add(float value);
+  string ToString(int buckets) const;
 
-}  // namespace mapping
+ private:
+  std::vector<float> values_;
+};
+
+}  // namespace common
 }  // namespace cartographer
 
-#endif  // CARTOGRAPHER_mapping_RAY_CASTING_H_
+#endif  // CARTOGRAPHER_COMMON_HISTOGRAM_H_

@@ -50,8 +50,8 @@ class LocalTrajectoryBuilder {
       const proto::LocalTrajectoryBuilderOptions& options);
   ~LocalTrajectoryBuilder();
 
-  LocalTrajectoryBuilder(const LocalTrajectoryBuilder&) = delete;
-  LocalTrajectoryBuilder& operator=(const LocalTrajectoryBuilder&) = delete;
+  //LocalTrajectoryBuilder(const LocalTrajectoryBuilder&) = delete;
+  //LocalTrajectoryBuilder& operator=(const LocalTrajectoryBuilder&) = delete;
 
   const mapping::PoseEstimate& pose_estimate() const;
 
