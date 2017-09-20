@@ -15,73 +15,43 @@
 #include "../sensor/odometry_data.h"
 #include "sensor_bridge.h"
 #include "msg_conversion.h"
-
-
-
 #include "../mapping/local_trajectory_builder_options.h"
-
-#include "../common/make_unique.h"
-
 #include "../mapping/local_trajectory_builder.h"
 
-
-
-/*
-class SampleCartoNode
+void publisher(double map_pub_period)
 {
-public:
-	SampleCartoNode()
+	ros::Rate r(1.0 / map_pub_period);
+	while (ros::ok())
 	{
-		ros::NodeHandle nh;
-		message_filters::Subscriber<nav_msgs::Odometry> odom_sub(nh, "odom", 10);
-		message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub(nh, "scan", 10);
-		typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::LaserScan, nav_msgs::Odometry> SyncPolicy;
-		message_filters::Synchronizer<SyncPolicy> sync(SyncPolicy(2000), scan_sub, odom_sub);
-		sync.registerCallback(boost::bind(&SampleCartoNode::callback, this, _1, _2));
-		ros::spin();
+		//ros::Time mapTime(ros::Time::now());
+		//publishMap(mapPubContainer[0], slamProcessor->getGridMap(0), mapTime, slamProcessor->getMapMutex(0));
+		std::cout << "in thread!" << std::endl;
+		r.sleep();
 	}
-
-private:
-	void callback(const sensor_msgs::LaserScanConstPtr &scan_msg, const nav_msgs::OdometryConstPtr &odom_msg)
-	{
-		std::cout<<"callback!"<<std::endl;
-	}
-};
-
-int main(int argc, char **argv)
-{
-	ros::init(argc, argv, "carto_slam");
-	SampleCartoNode scn;
 }
-*/
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "hector_slam");
-	BagReader bagReader("/home/liu/tokyo_bag/lg_1.bag","/scan","/odom",0, 3000);
+	ros::start();
+	BagReader bagReader("/home/liu/tokyo_bag/lg_1.bag", "/scan", "/odom", 0, 3000);
 	auto pairData = bagReader.mPairData;
-	auto p_local_trajectory_builder = ::cartographer::common::make_unique<::cartographer::mapping::LocalTrajectoryBuilder>(::cartographer::mapping::CreateLocalTrajectoryBuilderOptions());  
+	auto p_local_trajectory_builder = ::cartographer::common::make_unique<::cartographer::mapping::LocalTrajectoryBuilder>(::cartographer::mapping::CreateLocalTrajectoryBuilderOptions());
 	::cartographer_ros::SensorBridge sensor_bridge(std::move(p_local_trajectory_builder));
+	//auto map_publish_thread_ = new std::thread(&publisher, 0.5);
+	//map_publish_thread_->depatch();
+	new std::thread(&publisher, 0.5);
 
-	
 	for (auto a : pairData)
 	{
-		
+		if (!ros::ok())
+			break;
 		auto podom = boost::make_shared<const ::nav_msgs::Odometry>(a.second);
 		auto pscan = boost::make_shared<const ::sensor_msgs::LaserScan>(a.first);
-		
-		//const sensor_msgs::LaserScan_<std::allocator<void> >&}’ from expression of type ‘boost::shared_ptr<const sensor_msgs::LaserScan_<std::allocator<void> > >’
 
-		
 		//sensor_bridge.HandleOdometryMessage(podom);
 		sensor_bridge.HandleLaserScanMessage(pscan);
-
-		//auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(a.first);
-
-		//for(auto m:scan_data.points){
-		//	std::cout<<m<<std::endl;
-		//}
-		//std::cout<<scan_data.points<<std::endl;
 	}
+	//map_publish_thread_.join();
 	return 0;
 }
