@@ -28,25 +28,31 @@
 #include "sensor_msgs/LaserScan.h"
 #include "sensor_msgs/MultiEchoLaserScan.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "../mapping/local_trajectory_builder.h"
 
-namespace cartographer_ros {
+namespace cartographer_ros
+{
 
 // Converts ROS messages into SensorData in tracking frame for the MapBuilder.
-class SensorBridge {
- public:
-  explicit SensorBridge(){};
+class SensorBridge
+{
+public:
+  explicit SensorBridge(std::unique_ptr<::cartographer::mapping::LocalTrajectoryBuilder> p_local_trajectory_builder)
+  {
+    p_local_trajectory_builder_ = std::move(p_local_trajectory_builder);
+  };
 
-  SensorBridge(const SensorBridge&) = delete;
-  SensorBridge& operator=(const SensorBridge&) = delete;
+  SensorBridge(const SensorBridge &) = delete;
+  SensorBridge &operator=(const SensorBridge &) = delete;
 
   std::unique_ptr<::cartographer::sensor::OdometryData> ToOdometryData(const nav_msgs::Odometry::ConstPtr &msg);
-  
+
   void HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr &msg);
-  void HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr& msg);
+  void HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr &msg);
 
-
+  std::unique_ptr<::cartographer::mapping::LocalTrajectoryBuilder> p_local_trajectory_builder_;
 };
 
-}  // namespace cartographer_ros
+} // namespace cartographer_ros
 
-#endif  // CARTOGRAPHER_ROS_SENSOR_BRIDGE_H_
+#endif // CARTOGRAPHER_ROS_SENSOR_BRIDGE_H_

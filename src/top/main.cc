@@ -60,9 +60,9 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "hector_slam");
 	BagReader bagReader("/home/liu/tokyo_bag/lg_1.bag","/scan","/odom",0, 3000);
 	auto pairData = bagReader.mPairData;
-	::cartographer_ros::SensorBridge sensor_bridge;
-
 	auto p_local_trajectory_builder = ::cartographer::common::make_unique<::cartographer::mapping::LocalTrajectoryBuilder>(::cartographer::mapping::CreateLocalTrajectoryBuilderOptions());  
+	::cartographer_ros::SensorBridge sensor_bridge(std::move(p_local_trajectory_builder));
+
 	
 	for (auto a : pairData)
 	{
@@ -73,8 +73,9 @@ int main(int argc, char **argv)
 		//const sensor_msgs::LaserScan_<std::allocator<void> >&}’ from expression of type ‘boost::shared_ptr<const sensor_msgs::LaserScan_<std::allocator<void> > >’
 
 		
-		sensor_bridge.HandleOdometryMessage(podom);
+		//sensor_bridge.HandleOdometryMessage(podom);
 		sensor_bridge.HandleLaserScanMessage(pscan);
+
 		//auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(a.first);
 
 		//for(auto m:scan_data.points){

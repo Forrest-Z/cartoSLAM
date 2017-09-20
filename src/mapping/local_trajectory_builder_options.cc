@@ -37,35 +37,45 @@ proto::LocalTrajectoryBuilderOptions CreateLocalTrajectoryBuilderOptions() {
   options.set_voxel_filter_size(0.025);
   options.set_use_online_correlative_scan_matching(true);
 
-  sensor::proto::AdaptiveVoxelFilterOptions avfo;
-  avfo.set_max_length(0.5);
-  avfo.set_min_num_points(100);
-  avfo.set_max_range(50.);
-  *options.mutable_adaptive_voxel_filter_options() = avfo;
+  sensor::proto::AdaptiveVoxelFilterOptions adaptive_voxel_filter_options;
+  adaptive_voxel_filter_options.set_max_length(0.5);
+  adaptive_voxel_filter_options.set_min_num_points(100);
+  adaptive_voxel_filter_options.set_max_range(50.);
+  *options.mutable_adaptive_voxel_filter_options() = adaptive_voxel_filter_options;
 
-  sensor::proto::AdaptiveVoxelFilterOptions lcafo;
-  avfo.set_max_length(0.9);
-  avfo.set_min_num_points(100);
-  avfo.set_max_range(50.);
-  *options.mutable_loop_closure_adaptive_voxel_filter_options() = lcafo;
+  sensor::proto::AdaptiveVoxelFilterOptions loop_closure_adaptive_voxel_filter_options;
+  loop_closure_adaptive_voxel_filter_options.set_max_length(0.9);
+  loop_closure_adaptive_voxel_filter_options.set_min_num_points(100);
+  loop_closure_adaptive_voxel_filter_options.set_max_range(50.);
+  *options.mutable_loop_closure_adaptive_voxel_filter_options() = loop_closure_adaptive_voxel_filter_options;
   //::cartographer::mapping::scan_matching::proto::RealTimeCorrelativeScanMatcherOptions*>(&::cartographer::mapping::scan_matching::proto::Re
-  scan_matching::proto::RealTimeCorrelativeScanMatcherOptions rcso;
-  rcso.set_linear_search_window(0.1);
-  rcso.set_angular_search_window(0.34);
-  rcso.set_translation_delta_cost_weight(0.1);
-  rcso.set_rotation_delta_cost_weight(0.1);
-  *options.mutable_real_time_correlative_scan_matcher_options() = rcso;
+  scan_matching::proto::RealTimeCorrelativeScanMatcherOptions real_time_correlative_scan_matcher_options;
+  real_time_correlative_scan_matcher_options.set_linear_search_window(0.1);
+  real_time_correlative_scan_matcher_options.set_angular_search_window(0.34);
+  real_time_correlative_scan_matcher_options.set_translation_delta_cost_weight(0.1);
+  real_time_correlative_scan_matcher_options.set_rotation_delta_cost_weight(0.1);
+  *options.mutable_real_time_correlative_scan_matcher_options() = real_time_correlative_scan_matcher_options;
 
-  scan_matching::proto::CeresScanMatcherOptions csmo;
-  csmo.set_occupied_space_weight(1.);
-  csmo.set_translation_weight(10.);
-  csmo.set_rotation_weight(40.);
-  common::proto::CeresSolverOptions cso;
-  cso.set_use_nonmonotonic_steps(false);
-  cso.set_max_num_iterations(20);
-  cso.set_num_threads(1);
-  *csmo.mutable_ceres_solver_options() = cso;
-  *options.mutable_ceres_scan_matcher_options() = csmo;
+  scan_matching::proto::CeresScanMatcherOptions ceres_scan_matcher_options;
+  ceres_scan_matcher_options.set_occupied_space_weight(1.);
+  ceres_scan_matcher_options.set_translation_weight(10.);
+  ceres_scan_matcher_options.set_rotation_weight(40.);
+  common::proto::CeresSolverOptions ceres_solver_options;
+  ceres_solver_options.set_use_nonmonotonic_steps(false);
+  ceres_solver_options.set_max_num_iterations(20);
+  ceres_solver_options.set_num_threads(1);
+  *ceres_scan_matcher_options.mutable_ceres_solver_options() = ceres_solver_options;
+  *options.mutable_ceres_scan_matcher_options() = ceres_scan_matcher_options;
+
+  mapping::proto::SubmapsOptions submaps_options;
+  submaps_options.set_resolution(0.05);
+  submaps_options.set_num_range_data(90);
+  mapping::proto::RangeDataInserterOptions range_data_inserter_options;
+  range_data_inserter_options.set_hit_probability(0.55);
+  range_data_inserter_options.set_miss_probability(0.49);
+  range_data_inserter_options.set_insert_free_space(true);
+  *submaps_options.mutable_range_data_inserter_options() = range_data_inserter_options;
+  *options.mutable_submaps_options() = submaps_options;
 
 
 
