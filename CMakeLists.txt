@@ -17,6 +17,8 @@ find_package(PCL 1.2 REQUIRED)
 set(LUA_INCLUDE_DIR "/usr/local/include/")
 set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
 
+add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY)
+
 find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs  message_filters laser_geometry  rosbag)
 
 
