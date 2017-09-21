@@ -33,8 +33,11 @@
 #include "sensor_msgs/PointCloud2.h"
 
 namespace cartographer_ros {
+
+  
 using ::cartographer::transform::Rigid3d;
 using ::cartographer::sensor::PointCloudWithIntensities;
+constexpr float kPointCloudComponentFourMagic = 1.;
 
 
 // For sensor_msgs::LaserScan.
@@ -50,6 +53,7 @@ bool HasEcho(const sensor_msgs::LaserEcho& echo) {
 float GetFirstEcho(const sensor_msgs::LaserEcho& echo) {
   return echo.echoes[0];
 }
+
 
 template <typename LaserMessageType>
 PointCloudWithIntensities LaserScanToPointCloudWithIntensities(const LaserMessageType &msg)
@@ -83,7 +87,49 @@ PointCloudWithIntensities LaserScanToPointCloudWithIntensities(const LaserMessag
   return point_cloud;
 }
 
+sensor_msgs::PointCloud2 PreparePointCloud2Message(const double timestamp,
+  const string& frame_id,
+  const int num_points) {
+sensor_msgs::PointCloud2 msg;
+msg.header.stamp = ::ros::Time(timestamp);
+msg.header.frame_id = frame_id;
+msg.height = 1;
+msg.width = num_points;
+msg.fields.resize(3);
+msg.fields[0].name = "x";
+msg.fields[0].offset = 0;
+msg.fields[0].datatype = sensor_msgs::PointField::FLOAT32;
+msg.fields[0].count = 1;
+msg.fields[1].name = "y";
+msg.fields[1].offset = 4;
+msg.fields[1].datatype = sensor_msgs::PointField::FLOAT32;
+msg.fields[1].count = 1;
+msg.fields[2].name = "z";
+msg.fields[2].offset = 8;
+msg.fields[2].datatype = sensor_msgs::PointField::FLOAT32;
+msg.fields[2].count = 1;
+msg.is_bigendian = false;
+msg.point_step = 16;
+msg.row_step = 16 * msg.width;
+msg.is_dense = true;
+msg.data.resize(16 * num_points);
+return msg;
+}
 
+
+sensor_msgs::PointCloud2 ToPointCloud2Message(
+  const double timestamp, const string& frame_id,
+  const ::cartographer::sensor::PointCloud& point_cloud) {
+auto msg = PreparePointCloud2Message(timestamp, frame_id, point_cloud.size());
+::ros::serialization::OStream stream(msg.data.data(), msg.data.size());
+for (const auto& point : point_cloud) {
+  stream.next(point.x());
+  stream.next(point.y());
+  stream.next(point.z());
+  stream.next(kPointCloudComponentFourMagic);
+}
+return msg;
+}
 
 PointCloudWithIntensities ToPointCloudWithIntensities(
   const sensor_msgs::LaserScan& msg) {

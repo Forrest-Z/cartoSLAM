@@ -21,11 +21,18 @@
 void publisher(double map_pub_period)
 {
 	ros::Rate r(1.0 / map_pub_period);
+	::ros::NodeHandle node_handle;
+	::ros::Publisher pcd_publisher;
+	pcd_publisher = node_handle.advertise<sensor_msgs::PointCloud2>("carto_pcd", 1);
+
 	while (ros::ok())
 	{
-		//ros::Time mapTime(ros::Time::now());
-		//publishMap(mapPubContainer[0], slamProcessor->getGridMap(0), mapTime, slamProcessor->getMapMutex(0));
-		std::cout << "in thread!" << std::endl;
+		pcd_publisher.publish(ToPointCloud2Message(
+			carto::common::ToUniversal(trajectory_state.pose_estimate.time),
+			node_options_.map_frame,
+			carto::sensor::TransformPointCloud(
+				trajectory_state.pose_estimate.point_cloud,
+				trajectory_state.local_to_map.cast<float>())));
 		r.sleep();
 	}
 }
