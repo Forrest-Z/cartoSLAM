@@ -66,12 +66,13 @@ public:
   void AddSensorData(const sensor::OdometryData &odometry_data) override
   {
     local_trajectory_builder_.AddOdometerData(odometry_data);
-    sparse_pose_graph_->AddOdometerData(trajectory_id_, odometry_data);
+    //sparse_pose_graph_->AddOdometerData(trajectory_id_, odometry_data);
   }
-
 private:
   const int trajectory_id_;
+public:
   SparsePoseGraph *const sparse_pose_graph_;
+private:
   LocalTrajectoryBuilder local_trajectory_builder_;
 };
 

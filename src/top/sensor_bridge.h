@@ -28,7 +28,10 @@
 #include "sensor_msgs/LaserScan.h"
 #include "sensor_msgs/MultiEchoLaserScan.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "../mapping/global_trajectory_builder.h"
+#include "../mapping/local_trajectory_builder_options.h"
 #include "../mapping/local_trajectory_builder.h"
+#include "../mapping/sparse_pose_graph.h"
 
 namespace cartographer_ros
 {
@@ -37,9 +40,12 @@ namespace cartographer_ros
 class SensorBridge
 {
 public:
-  explicit SensorBridge(std::unique_ptr<::cartographer::mapping::LocalTrajectoryBuilder> p_local_trajectory_builder)
+  explicit SensorBridge( std::shared_ptr<::cartographer::mapping::GlobalTrajectoryBuilder<
+		::cartographer::mapping::LocalTrajectoryBuilder,
+		::cartographer::mapping::proto::LocalTrajectoryBuilderOptions,
+		::cartographer::mapping::SparsePoseGraph>> p_global_trajectory_builder)
   {
-    p_local_trajectory_builder_ = std::move(p_local_trajectory_builder);
+    p_global_trajectory_builder_ = std::move(p_global_trajectory_builder);
   };
 
   SensorBridge(const SensorBridge &) = delete;
@@ -50,7 +56,10 @@ public:
   void HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr &msg);
   void HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr &msg);
 
-  std::unique_ptr<::cartographer::mapping::LocalTrajectoryBuilder> p_local_trajectory_builder_;
+  std::shared_ptr<::cartographer::mapping::GlobalTrajectoryBuilder<
+  ::cartographer::mapping::LocalTrajectoryBuilder,
+  ::cartographer::mapping::proto::LocalTrajectoryBuilderOptions,
+  ::cartographer::mapping::SparsePoseGraph>> p_global_trajectory_builder_;
 };
 
 } // namespace cartographer_ros

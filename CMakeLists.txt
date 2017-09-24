@@ -13,9 +13,9 @@ find_package(Ceres REQUIRED COMPONENTS SparseLinearAlgebraLibrary)
 find_package(Eigen3 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(PCL 1.2 REQUIRED)
-#find_package(Lua REQUIRED)
-set(LUA_INCLUDE_DIR "/usr/local/include/")
-set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
+find_package(Lua REQUIRED)
+#set(LUA_INCLUDE_DIR "/usr/local/include/")
+#set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
 
 add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY)
 

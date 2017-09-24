@@ -40,8 +40,8 @@ void SensorBridge::HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr
     auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(*msg);
     double timestamp = msg->header.stamp.toSec();
     Eigen::Vector3f origin = Eigen::Vector3f::Zero();
-    auto insertion_result = p_local_trajectory_builder_->AddRangeData(timestamp, ::cartographer::sensor::RangeData{origin, scan_data.points, {}});
-    std::cout<<p_local_trajectory_builder_->pose_estimate().pose<<std::endl;
+    p_global_trajectory_builder_->AddRangefinderData(timestamp, origin, scan_data.points);
+
 }
 
 void SensorBridge::HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr& msg) 
