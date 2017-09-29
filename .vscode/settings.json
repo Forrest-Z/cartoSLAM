@@ -43,6 +43,13 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "system_error": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "ostream": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp"
     }
 }

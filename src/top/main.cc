@@ -18,7 +18,10 @@
 #include "../mapping/local_trajectory_builder_options.h"
 #include "../mapping/local_trajectory_builder.h"
 #include "../mapping/global_trajectory_builder.h"
-#include "cartographer_ros_msgs/SubmapList.h"
+#include "SubmapList.h"
+
+#include "nav_msgs/GetMap.h"
+
 #include "../mapping/sparse_pose_graph.h"
 
 class Publisher
@@ -28,8 +31,12 @@ class Publisher
 						   ::cartographer::mapping::LocalTrajectoryBuilder,
 						   ::cartographer::mapping::proto::LocalTrajectoryBuilderOptions,
 						   ::cartographer::mapping::SparsePoseGraph>>
-						   p_global_trajectory_builder, double map_pub_period) : 
-						   p_global_trajectory_builder_(p_global_trajectory_builder),map_pub_period_(map_pub_period){};
+						   p_global_trajectory_builder,
+					   double map_pub_period) : p_global_trajectory_builder_(p_global_trajectory_builder), map_pub_period_(map_pub_period){
+						//map_.map.data.resize(4000*4000);
+						//memset(&map_.map.data[0], 180, sizeof(int8_t) * map_.map.data.size());
+						mapPublisher_ = node_.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
+					   };
 
 	void pcd()
 	{
@@ -40,7 +47,7 @@ class Publisher
 
 		while (ros::ok())
 		{
-			cartographer_ros_msgs::SubmapList submap_list;
+			carto_slam::SubmapList submap_list;
 			const auto all_submap_data = p_global_trajectory_builder_->sparse_pose_graph_->GetAllSubmapData();
 			/*
 
@@ -66,8 +73,37 @@ class Publisher
     }
   }
   return submap_list;
+  
 						*/
-						std::cout<<"！"<<std::endl;
+			if (!(all_submap_data.size() == 2 && all_submap_data[1].size() > 0))
+				continue;
+			auto grid = all_submap_data[1][all_submap_data[1].size() -1].submap->probability_grid();
+			std::vector<int8_t> &data = map_.map.data;
+
+			map_.map.info.origin.position.x = 0;
+			map_.map.info.origin.position.y = 0;
+			map_.map.info.origin.orientation.w = 1.0;
+
+			map_.map.info.resolution = grid.limits().resolution();
+
+			map_.map.info.width = grid.limits().cell_limits().num_x_cells;
+			map_.map.info.height = grid.limits().cell_limits().num_y_cells;
+
+			map_.map.header.frame_id = "map";
+			map_.map.data.resize(map_.map.info.width * map_.map.info.height);
+			memset(&map_.map.data[0], 100, sizeof(int8_t) * map_.map.data.size());
+			map_.map.header.stamp = ros::Time::now();
+			for (size_t y = 0; y < grid.limits().cell_limits().num_y_cells; ++y)
+			{
+				for (size_t x = 0; x < grid.limits().cell_limits().num_x_cells; ++x)
+				{
+					data[y * grid.limits().cell_limits().num_y_cells + x] = 
+					grid.GetProbability(Eigen::Array2i(x, y)) * 100;
+					
+				}
+			}
+			mapPublisher_.publish(map_.map);
+			ros::spinOnce();
 			r.sleep();
 		}
 	}
@@ -79,13 +115,16 @@ class Publisher
 		::cartographer::mapping::SparsePoseGraph>>
 		p_global_trajectory_builder_;
 	double map_pub_period_;
+	nav_msgs::GetMap::Response map_;
+	ros::Publisher mapPublisher_;
+	ros::NodeHandle node_;
 };
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "hector_slam");
 	ros::start();
-	BagReader bagReader("/home/liu/h1.bag", "scan", "odom", 0, 3000);
+	BagReader bagReader("/home/liu/workspace/cartoSLAM/lg_kusatsu_C5_1.bag", "/scan", "/odom", 0, 3000);
 	auto pairData = bagReader.mPairData;
 
 	//new std::thread(&publisher, 0.5);
@@ -96,7 +135,7 @@ int main(int argc, char **argv)
 		::cartographer::mapping::SparsePoseGraph>>(
 		::cartographer::mapping::CreateLocalTrajectoryBuilderOptions(),
 		1, new ::cartographer::mapping::SparsePoseGraph());
-	
+
 	Publisher pub = Publisher(p_golbal_trajectory_builder, 0.5);
 	::cartographer_ros::SensorBridge sensor_bridge(p_golbal_trajectory_builder);
 
