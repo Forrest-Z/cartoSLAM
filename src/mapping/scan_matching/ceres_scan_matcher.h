@@ -21,10 +21,10 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "../../common/lua_parameter_dictionary.h"
-#include "../../mapping/probability_grid.h"
+#include "src/common/lua_parameter_dictionary.h"
+#include "src/mapping/probability_grid.h"
 #include "src/mapping/scan_matching/proto/ceres_scan_matcher_options.pb.h"
-#include "../../sensor/point_cloud.h"
+#include "src/sensor/point_cloud.h"
 #include "ceres/ceres.h"
 
 namespace cartographer {

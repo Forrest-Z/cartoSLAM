@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-#include "../common/make_unique.h"
-#include "../transform/transform.h"
+#include "src/common/make_unique.h"
+#include "src/transform/transform.h"
 //#include "glog/logging.h"
 
 namespace cartographer {

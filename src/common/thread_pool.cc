@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "../common/thread_pool.h"
+#include "src/common/thread_pool.h"
 
 #include <unistd.h>
 #include <algorithm>

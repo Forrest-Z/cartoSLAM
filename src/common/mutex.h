@@ -17,9 +17,9 @@
 #ifndef CARTOGRAPHER_COMMON_MUTEX_H_
 #define CARTOGRAPHER_COMMON_MUTEX_H_
 
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
-
 
 namespace cartographer {
 namespace common {
@@ -77,11 +77,13 @@ class CAPABILITY("mutex") Mutex {
 
     template <typename Predicate>
     bool AwaitWithTimeout(Predicate predicate, double timeout)
-        REQUIRES(this) {
-      return mutex_->condition_.wait_for(lock_, timeout, predicate);
+        REQUIRES(this)
+    {
+      auto millisec = std::chrono::microseconds(1);
+      return mutex_->condition_.wait_for(lock_, millisec*timeout*1e6, predicate);
     }
 
-   private:
+  private:
     Mutex* mutex_;
     std::unique_lock<std::mutex> lock_;
   };

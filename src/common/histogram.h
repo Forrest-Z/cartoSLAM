@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "../common/port.h"
+#include "src/common/port.h"
 
 namespace cartographer {
 namespace common {

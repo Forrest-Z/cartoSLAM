@@ -20,78 +20,95 @@
 #include <memory>
 
 //#include "../common/time.h"
-#include "../mapping/pose_estimate.h"
-#include "../mapping/pose_extrapolator.h"
+#include "src/mapping/pose_estimate.h"
+#include "src/mapping/pose_extrapolator.h"
 #include "src/mapping/proto/local_trajectory_builder_options.pb.h"
-#include "../mapping/scan_matching/ceres_scan_matcher.h"
-#include "../mapping/scan_matching/real_time_correlative_scan_matcher.h"
-#include "../mapping/submaps.h"
-//#include "../mapping_3d/motion_filter.h"
-//#include "../sensor/imu_data.h"
-#include "../sensor/odometry_data.h"
-#include "../sensor/range_data.h"
-#include "../sensor/voxel_filter.h"
-#include "../transform/rigid_transform.h"
+#include "src/mapping/scan_matching/real_time_correlative_scan_matcher.h"
 
-namespace cartographer {
-namespace mapping {
+#include "src/mapping/scan_matching/ceres_scan_matcher.h"
+//#include "src/mapping/scan_matching/real_time_correlative_scan_matcher.h"
+#include "src/mapping/submaps.h"
+#include "../mapping/motion_filter.h"
+//#include "../sensor/imu_data.h"
+#include "src/sensor/odometry_data.h"
+#include "src/sensor/range_data.h"
+//#include "src/sensor/voxel_filter.h"
+#include "src/transform/rigid_transform.h"
+#include "src/mapping/trajectory_node.h"
+
+
+#include "nav_msgs/GetMap.h"
+#include <ros/ros.h>
+
+namespace cartographer
+{
+namespace mapping
+{
 
 // Wires up the local SLAM stack (i.e. pose extrapolator, scan matching, etc.)
 // without loop closure.
-class LocalTrajectoryBuilder {
- public:
-  struct InsertionResult {
-    std::shared_ptr<const mapping::TrajectoryNode::Data> constant_data;
-    transform::Rigid3d pose_observation;
-    std::vector<std::shared_ptr<const Submap>> insertion_submaps;
-  };
+class LocalTrajectoryBuilder
+{
+  public:
+    
+    struct InsertionResult
+    {
+        std::shared_ptr<const mapping::TrajectoryNode::Data> constant_data;
+        transform::Rigid3d pose_observation;
+        std::vector<std::shared_ptr<const Submap>> insertion_submaps;
+    };
 
-  explicit LocalTrajectoryBuilder(
-      const proto::LocalTrajectoryBuilderOptions& options);
-  ~LocalTrajectoryBuilder();
+    explicit LocalTrajectoryBuilder(const proto::LocalTrajectoryBuilderOptions &options);
+    ~LocalTrajectoryBuilder();
 
-  //LocalTrajectoryBuilder(const LocalTrajectoryBuilder&) = delete;
-  //LocalTrajectoryBuilder& operator=(const LocalTrajectoryBuilder&) = delete;
+    LocalTrajectoryBuilder(const LocalTrajectoryBuilder&) = delete;
+    LocalTrajectoryBuilder& operator=(const LocalTrajectoryBuilder&) = delete;
 
-  const mapping::PoseEstimate& pose_estimate() const;
+    //const mapping::PoseEstimate &pose_estimate() const;
 
-  // Range data must be approximately horizontal for 2D SLAM.
-  std::unique_ptr<InsertionResult> AddRangeData(
-      double, const sensor::RangeData& range_data);
-  void AddOdometerData(const sensor::OdometryData& odometry_data);
+    // Range data must be approximately horizontal for 2D SLAM.
+    std::unique_ptr<InsertionResult> AddRangeData(double, const sensor::RangeData &range_data);
+    void AddOdometerData(const sensor::OdometryData &odometry_data);
 
- private:
-  std::unique_ptr<InsertionResult> AddAccumulatedRangeData(
-      double time, const sensor::RangeData& range_data);
-  sensor::RangeData TransformAndFilterRangeData(
-      const transform::Rigid3f& gravity_alignment,
-      const sensor::RangeData& range_data) const;
+  private:
 
-  // Scan matches 'gravity_aligned_range_data' and fill in the
-  // 'pose_observation' with the result.
-  void ScanMatch(double time, const transform::Rigid2d& pose_prediction,
-                 const sensor::RangeData& gravity_aligned_range_data,
-                 transform::Rigid2d* pose_observation);
+    
+    std::unique_ptr<InsertionResult> AddAccumulatedRangeData(double time, const sensor::RangeData &range_data);
+    
+    sensor::RangeData TransformAndFilterRangeData(
+        const transform::Rigid3f &gravity_alignment,
+        const sensor::RangeData &range_data) const;
 
-  // Lazily constructs a PoseExtrapolator.
-  void InitializeExtrapolator(double time);
+    // Scan matches 'gravity_aligned_range_data' and fill in the
+    // 'pose_observation' with the result.
+    void ScanMatch(const double time, const transform::Rigid2d &pose_prediction,
+                   const sensor::RangeData &gravity_aligned_range_data,
+                   transform::Rigid2d *pose_observation);
+                   
 
-  const proto::LocalTrajectoryBuilderOptions options_;
-  ActiveSubmaps active_submaps_;
+    // Lazily constructs a PoseExtrapolator.
+    void InitializeExtrapolator(double time);
 
-  mapping::PoseEstimate last_pose_estimate_;
+    const proto::LocalTrajectoryBuilderOptions options_;
+    ActiveSubmaps active_submaps_;
+    mapping::PoseEstimate last_pose_estimate_;
+    MotionFilter motion_filter_;    
+    scan_matching::RealTimeCorrelativeScanMatcher real_time_correlative_scan_matcher_;
+    scan_matching::CeresScanMatcher ceres_scan_matcher_;
+    std::unique_ptr<mapping::PoseExtrapolator> extrapolator_;
+    int num_accumulated_ = 0;
+    transform::Rigid3f first_pose_estimate_ = transform::Rigid3f::Identity();
+    sensor::RangeData accumulated_range_data_;
 
-  scan_matching::RealTimeCorrelativeScanMatcher real_time_correlative_scan_matcher_;
-  scan_matching::CeresScanMatcher ceres_scan_matcher_;
 
-  std::unique_ptr<mapping::PoseExtrapolator> extrapolator_;
+    nav_msgs::GetMap::Response map_;
+    ros::Publisher mapPublisher_;
+    ros::NodeHandle node_;
+    
 
-  int num_accumulated_ = 0;
-  transform::Rigid3f first_pose_estimate_ = transform::Rigid3f::Identity();
-  sensor::RangeData accumulated_range_data_;
 };
 
-}  // namespace mapping
-}  // namespace cartographer
+} // namespace mapping
+} // namespace cartographer
 
-#endif  // CARTOGRAPHER_mapping_LOCAL_TRAJECTORY_BUILDER_H_
+#endif // CARTOGRAPHER_mapping_LOCAL_TRAJECTORY_BUILDER_H_

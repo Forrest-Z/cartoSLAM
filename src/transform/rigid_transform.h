@@ -22,7 +22,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "../common/math.h"
+#include "src/common/math.h"
 
 namespace cartographer {
 namespace transform {

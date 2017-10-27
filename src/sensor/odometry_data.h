@@ -18,7 +18,7 @@
 #define CARTOGRAPHER_SENSOR_ODOMETRY_DATA_H_
 
 #include "src/sensor/proto/sensor.pb.h"
-#include "../transform/rigid_transform.h"
+#include "src/transform/rigid_transform.h"
 
 namespace cartographer {
 namespace sensor {

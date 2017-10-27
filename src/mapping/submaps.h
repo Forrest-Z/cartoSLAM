@@ -21,17 +21,17 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "../common/lua_parameter_dictionary.h"
-#include "src/mapping/proto/serialization.pb.h"
-#include "src/mapping/proto/submap_visualization.pb.h"
-#include "../mapping/submaps.h"
-#include "../mapping/trajectory_node.h"
-#include "../mapping/map_limits.h"
-#include "../mapping/probability_grid.h"
+#include "src/common/lua_parameter_dictionary.h"
+//#include "src/mapping/proto/serialization.pb.h"
+//#include "src/mapping/proto/submap_visualization.pb.h"
+#include "src/mapping/submaps.h"
+//#include "src/mapping/trajectory_node.h"
+#include "src/mapping/map_limits.h"
+#include "src/mapping/probability_grid.h"
 #include "src/mapping/proto/submaps_options.pb.h"
-#include "../mapping/range_data_inserter.h"
-#include "../sensor/range_data.h"
-#include "../transform/rigid_transform.h"
+#include "src/mapping/range_data_inserter.h"
+#include "src/sensor/range_data.h"
+#include "src/transform/rigid_transform.h"
 
 namespace cartographer
 {
@@ -69,16 +69,16 @@ class Submap
 {
   public:
     Submap(const MapLimits &limits, const Eigen::Vector2f &origin);
-    explicit Submap(const mapping::proto::Submap2D &proto);
+    //explicit Submap(const mapping::proto::Submap2D &proto);
 
-    void ToProto(mapping::proto::Submap *proto) const;
+    //void ToProto(mapping::proto::Submap *proto) const;
 
     const ProbabilityGrid &probability_grid() const { return probability_grid_; }
     bool finished() const { return finished_; }
 
-    void ToResponseProto(
-        const transform::Rigid3d &global_submap_pose,
-        mapping::proto::SubmapQuery::Response *response) const;
+    //void ToResponseProto(
+    //    const transform::Rigid3d &global_submap_pose,
+    //    mapping::proto::SubmapQuery::Response *response) const;
 
     // Insert 'range_data' into this submap using 'range_data_inserter'. The
     // submap must not be finished yet.

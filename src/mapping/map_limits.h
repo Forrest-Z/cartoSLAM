@@ -22,14 +22,14 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "../common/math.h"
+#include "src/common/math.h"
 //#include "../mapping/trajectory_node.h"
-#include "src/mapping/proto/map_limits.pb.h"
-#include "../mapping/xy_index.h"
-#include "../sensor/point_cloud.h"
-#include "../sensor/range_data.h"
-#include "../transform/rigid_transform.h"
-#include "../transform/transform.h"
+//#include "src/mapping/proto/map_limits.pb.h"
+#include "src/mapping/xy_index.h"
+#include "src/sensor/point_cloud.h"
+#include "src/sensor/range_data.h"
+#include "src/transform/rigid_transform.h"
+#include "src/transform/transform.h"
 #include "glog/logging.h"
 
 namespace cartographer {
@@ -39,19 +39,14 @@ namespace mapping {
 // performance reasons.
 class MapLimits {
  public:
-  MapLimits(const double resolution, const Eigen::Vector2d& max,
-            const CellLimits& cell_limits)
-      : resolution_(resolution), max_(max), cell_limits_(cell_limits) {
+  MapLimits(const double resolution, const Eigen::Vector2d& max, const CellLimits& cell_limits)
+      : resolution_(resolution)
+      , max_(max)
+      , cell_limits_(cell_limits) {
     CHECK_GT(resolution_, 0.);
     CHECK_GT(cell_limits.num_x_cells, 0.);
     CHECK_GT(cell_limits.num_y_cells, 0.);
   }
-
-  explicit MapLimits(const proto::MapLimits& map_limits)
-      : resolution_(map_limits.resolution()),
-        max_(transform::ToEigen(map_limits.max())),
-        cell_limits_(map_limits.cell_limits()) {}
-
   // Returns the cell size in meters. All cells are square and the resolution is
   // the length of one side.
   double resolution() const { return resolution_; }
@@ -66,7 +61,8 @@ class MapLimits {
   // Returns the index of the cell containing the 'point' which may be outside
   // the map, i.e., negative or too large indices that will return false for
   // Contains().
-  Eigen::Array2i GetCellIndex(const Eigen::Vector2f& point) const {
+  Eigen::Array2i GetCellIndex(const Eigen::Vector2f &point) const
+  {
     // Index values are row major and the top left has Eigen::Array2i::Zero()
     // and contains (centered_max_x, centered_max_y). We need to flip and
     // rotate.
@@ -89,13 +85,6 @@ class MapLimits {
   CellLimits cell_limits_;
 };
 
-inline proto::MapLimits ToProto(const MapLimits& map_limits) {
-  proto::MapLimits result;
-  result.set_resolution(map_limits.resolution());
-  *result.mutable_max() = transform::ToProto(map_limits.max());
-  *result.mutable_cell_limits() = ToProto(map_limits.cell_limits());
-  return result;
-}
 
 }  // namespace mapping
 }  // namespace cartographer

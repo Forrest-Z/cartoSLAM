@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "lua.h"
+#include <lua.hpp>
 #include "port.h"
 #include "glog/logging.h"
 

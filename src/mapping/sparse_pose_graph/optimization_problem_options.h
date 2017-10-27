@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-#include "src/common/fixed_ratio_sampler.h"
+#ifndef CARTOGRAPHER_MAPPING_SPARSE_POSE_GRAPH_OPTIMIZATION_PROBLEM_OPTIONS_H_
+#define CARTOGRAPHER_MAPPING_SPARSE_POSE_GRAPH_OPTIMIZATION_PROBLEM_OPTIONS_H_
+
+#include "src/common/lua_parameter_dictionary.h"
+#include "src/mapping/sparse_pose_graph/proto/optimization_problem_options.pb.h"
 
 namespace cartographer {
-namespace common {
+namespace mapping {
+namespace sparse_pose_graph {
 
-FixedRatioSampler::FixedRatioSampler(const double ratio) : ratio_(ratio) {}
+proto::OptimizationProblemOptions CreateOptimizationProblemOptions(
+    common::LuaParameterDictionary* parameter_dictionary);
 
-FixedRatioSampler::~FixedRatioSampler() {}
-
-bool FixedRatioSampler::Pulse() {
-  ++num_pulses_;
-  if (static_cast<double>(num_samples_) / num_pulses_ < ratio_) {
-    ++num_samples_;
-    return true;
-  }
-  return false;
-}
-
-string FixedRatioSampler::DebugString() {
-  return std::to_string(num_samples_) + " (" +
-         std::to_string(100. * num_samples_ / num_pulses_) + "%)";
-}
-
-}  // namespace common
+}  // namespace sparse_pose_graph
+}  // namespace mapping
 }  // namespace cartographer
+
+#endif  // CARTOGRAPHER_MAPPING_SPARSE_POSE_GRAPH_OPTIMIZATION_PROBLEM_OPTIONS_H_

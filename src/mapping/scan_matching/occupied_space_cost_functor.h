@@ -19,8 +19,8 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "../../mapping/probability_grid.h"
-#include "../../sensor/point_cloud.h"
+#include "src/mapping/probability_grid.h"
+#include "src/sensor/point_cloud.h"
 #include "ceres/ceres.h"
 #include "ceres/cubic_interpolation.h"
 

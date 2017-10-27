@@ -50,6 +50,10 @@
         "iostream": "cpp",
         "istream": "cpp",
         "sstream": "cpp",
-        "streambuf": "cpp"
+        "streambuf": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "valarray": "cpp",
+        "map": "cpp"
     }
 }

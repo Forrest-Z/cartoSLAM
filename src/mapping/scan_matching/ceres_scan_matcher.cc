@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-#include "../../mapping/scan_matching/ceres_scan_matcher.h"
+#include "src/mapping/scan_matching/ceres_scan_matcher.h"
 
 #include <utility>
 #include <vector>
 
 #include "Eigen/Core"
-#include "../../common/ceres_solver_options.h"
-#include "../../common/lua_parameter_dictionary.h"
-#include "../../mapping/probability_grid.h"
-#include "../../mapping/scan_matching/occupied_space_cost_functor.h"
-#include "../../mapping/scan_matching/rotation_delta_cost_functor.h"
-#include "../../mapping/scan_matching/translation_delta_cost_functor.h"
-#include "../../transform/transform.h"
+#include "src/common/ceres_solver_options.h"
+#include "src/common/lua_parameter_dictionary.h"
+#include "src/mapping/probability_grid.h"
+#include "src/mapping/scan_matching/occupied_space_cost_functor.h"
+#include "src/mapping/scan_matching/rotation_delta_cost_functor.h"
+#include "src/mapping/scan_matching/translation_delta_cost_functor.h"
+#include "src/transform/transform.h"
 #include "ceres/ceres.h"
 #include "glog/logging.h"
 
@@ -37,6 +37,8 @@ namespace scan_matching {
 proto::CeresScanMatcherOptions CreateCeresScanMatcherOptions(
     common::LuaParameterDictionary* const parameter_dictionary) {
   proto::CeresScanMatcherOptions options;
+
+
   options.set_occupied_space_weight(
       parameter_dictionary->GetDouble("occupied_space_weight"));
   options.set_translation_weight(

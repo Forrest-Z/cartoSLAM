@@ -20,28 +20,13 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "../mapping/ray_casting.h"
-#include "../mapping/xy_index.h"
+#include "src/mapping/ray_casting.h"
+#include "src/mapping/xy_index.h"
 #include "glog/logging.h"
 
 namespace cartographer {
 namespace mapping {
 
-proto::RangeDataInserterOptions CreateRangeDataInserterOptions(
-    common::LuaParameterDictionary* const parameter_dictionary) {
-  proto::RangeDataInserterOptions options;
-  options.set_hit_probability(
-      parameter_dictionary->GetDouble("hit_probability"));
-  options.set_miss_probability(
-      parameter_dictionary->GetDouble("miss_probability"));
-  options.set_insert_free_space(
-      parameter_dictionary->HasKey("insert_free_space")
-          ? parameter_dictionary->GetBool("insert_free_space")
-          : true);
-  CHECK_GT(options.hit_probability(), 0.5);
-  CHECK_LT(options.miss_probability(), 0.5);
-  return options;
-}
 
 RangeDataInserter::RangeDataInserter(
     const proto::RangeDataInserterOptions& options)
@@ -58,6 +43,27 @@ void RangeDataInserter::Insert(const sensor::RangeData& range_data,
   CastRays(range_data, hit_table_, miss_table_, options_.insert_free_space(),
            CHECK_NOTNULL(probability_grid));
   probability_grid->FinishUpdate();
+}
+
+proto::RangeDataInserterOptions CreateRangeDataInserterOptions(
+    common::LuaParameterDictionary* const parameter_dictionary) {
+  proto::RangeDataInserterOptions options;
+
+
+  //options.set_hit_probability(0.55);
+  //options.set_miss_probability(0.49);
+  //options.set_insert_free_space(true)
+  options.set_hit_probability(
+      parameter_dictionary->GetDouble("hit_probability"));
+  options.set_miss_probability(
+      parameter_dictionary->GetDouble("miss_probability"));
+  options.set_insert_free_space(
+      parameter_dictionary->HasKey("insert_free_space")
+          ? parameter_dictionary->GetBool("insert_free_space")
+          : true);
+  CHECK_GT(options.hit_probability(), 0.5);
+  CHECK_LT(options.miss_probability(), 0.5);
+  return options;
 }
 
 }  // namespace mapping

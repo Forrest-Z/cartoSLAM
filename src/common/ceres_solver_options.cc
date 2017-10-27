@@ -22,6 +22,9 @@ namespace common {
 proto::CeresSolverOptions CreateCeresSolverOptionsProto(
     common::LuaParameterDictionary* parameter_dictionary) {
   proto::CeresSolverOptions proto;
+  //proto.set_use_nonmonotonic_steps(true);
+  //proto.set_max_num_iterations(20);
+  //proto.set_num_threads(1)
   proto.set_use_nonmonotonic_steps(
       parameter_dictionary->GetBool("use_nonmonotonic_steps"));
   proto.set_max_num_iterations(

@@ -17,7 +17,8 @@ syntax = "proto2";
 package cartographer.mapping.proto;
 
 
-import "src/sensor/proto/adaptive_voxel_filter_options.proto";
+//import "src/sensor/proto/adaptive_voxel_filter_options.proto";
+import "src/mapping/proto/motion_filter_options.proto";
 import "src/mapping/proto/submaps_options.proto";
 import "src/mapping/scan_matching/proto/ceres_scan_matcher_options.proto";
 import "src/mapping/scan_matching/proto/real_time_correlative_scan_matcher_options.proto";
@@ -41,13 +42,13 @@ message LocalTrajectoryBuilderOptions {
   optional float voxel_filter_size = 3;
 
   // Voxel filter used to compute a sparser point cloud for matching.
-  optional sensor.proto.AdaptiveVoxelFilterOptions
-      adaptive_voxel_filter_options = 6;
+  //optional sensor.proto.AdaptiveVoxelFilterOptions
+  //    adaptive_voxel_filter_options = 6;
 
   // Voxel filter used to compute a sparser point cloud for finding loop
   // closures.
-  optional sensor.proto.AdaptiveVoxelFilterOptions
-      loop_closure_adaptive_voxel_filter_options = 20;
+  //optional sensor.proto.AdaptiveVoxelFilterOptions
+  //    loop_closure_adaptive_voxel_filter_options = 20;
 
   // Whether to solve the online scan matching first using the correlative scan
   // matcher to generate a good starting point for Ceres.
@@ -56,7 +57,7 @@ message LocalTrajectoryBuilderOptions {
       real_time_correlative_scan_matcher_options = 7;
   optional scan_matching.proto.CeresScanMatcherOptions
       ceres_scan_matcher_options = 8;
-  //optional mapping_3d.proto.MotionFilterOptions motion_filter_options = 13;
+  optional mapping.proto.MotionFilterOptions motion_filter_options = 13;
 
   // Time constant in seconds for the orientation moving average based on
   // observed gravity via the IMU. It should be chosen so that the error

@@ -23,33 +23,22 @@
 #include <iterator>
 
 #include "Eigen/Core"
-#include "../common/math.h"
-#include "../common/port.h"
-#include "src/mapping/proto/cell_limits.pb.h"
+#include "src/common/math.h"
+#include "src/common/port.h"
 #include "glog/logging.h"
 
 namespace cartographer {
 namespace mapping {
 
-struct CellLimits {
+struct CellLimits
+{
   CellLimits() = default;
   CellLimits(int init_num_x_cells, int init_num_y_cells)
       : num_x_cells(init_num_x_cells), num_y_cells(init_num_y_cells) {}
 
-  explicit CellLimits(const proto::CellLimits& cell_limits)
-      : num_x_cells(cell_limits.num_x_cells()),
-        num_y_cells(cell_limits.num_y_cells()) {}
-
   int num_x_cells = 0;
   int num_y_cells = 0;
 };
-
-inline proto::CellLimits ToProto(const CellLimits& cell_limits) {
-  proto::CellLimits result;
-  result.set_num_x_cells(cell_limits.num_x_cells);
-  result.set_num_y_cells(cell_limits.num_y_cells);
-  return result;
-}
 
 // Iterates in row-major order through a range of xy-indices.
 class XYIndexRangeIterator
@@ -68,14 +57,18 @@ class XYIndexRangeIterator
                              Eigen::Array2i(cell_limits.num_x_cells - 1,
                                             cell_limits.num_y_cells - 1)) {}
 
-  XYIndexRangeIterator& operator++() {
+  XYIndexRangeIterator &operator++()
+  {
     // This is a necessary evil. Bounds checking is very expensive and needs to
     // be avoided in production. We have unit tests that exercise this check
     // in debug mode.
     DCHECK(*this != end());
-    if (xy_index_.x() < max_xy_index_.x()) {
+    if (xy_index_.x() < max_xy_index_.x())
+    {
       ++xy_index_.x();
-    } else {
+    }
+    else
+    {
       xy_index_.x() = min_xy_index_.x();
       ++xy_index_.y();
     }

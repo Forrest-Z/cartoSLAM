@@ -23,8 +23,8 @@
 #include <limits>
 
 #include "Eigen/Geometry"
-#include "../common/make_unique.h"
-#include "../common/port.h"
+#include "src/common/make_unique.h"
+#include "src/common/port.h"
 #include "glog/logging.h"
 
 namespace cartographer
@@ -58,9 +58,14 @@ proto::SubmapsOptions CreateSubmapsOptions(
     common::LuaParameterDictionary *const parameter_dictionary)
 {
   proto::SubmapsOptions options;
+  //options.set_resolution(0.05);
+  //options.set_num_range_data(30);
+  //*options.mutable_range_data_inserter_options() =
+  //    CreateRangeDataInserterOptions(
+  //      parameter_dictionary);
+
   options.set_resolution(parameter_dictionary->GetDouble("resolution"));
-  options.set_num_range_data(
-      parameter_dictionary->GetNonNegativeInt("num_range_data"));
+  options.set_num_range_data(parameter_dictionary->GetNonNegativeInt("num_range_data"));
   *options.mutable_range_data_inserter_options() =
       CreateRangeDataInserterOptions(
           parameter_dictionary->GetDictionary("range_data_inserter").get());
@@ -72,76 +77,6 @@ proto::SubmapsOptions CreateSubmapsOptions(
 Submap::Submap(const MapLimits &limits, const Eigen::Vector2f &origin)
     : local_pose_(transform::Rigid3d::Translation(Eigen::Vector3d(origin.x(), origin.y(), 0.))),
       probability_grid_(limits) {}
-
-Submap::Submap(const mapping::proto::Submap2D &proto)
-    : local_pose_(transform::ToRigid3(proto.local_pose())),
-      probability_grid_(ProbabilityGrid(proto.probability_grid()))
-{
-  SetNumRangeData(proto.num_range_data());
-  finished_ = proto.finished();
-}
-
-void Submap::ToProto(mapping::proto::Submap *const proto) const
-{
-  auto *const submap_2d = proto->mutable_submap_2d();
-  *submap_2d->mutable_local_pose() = transform::ToProto(local_pose());
-  submap_2d->set_num_range_data(num_range_data());
-  submap_2d->set_finished(finished_);
-  *submap_2d->mutable_probability_grid() = probability_grid_.ToProto();
-}
-
-void Submap::ToResponseProto(
-    const transform::Rigid3d &,
-    mapping::proto::SubmapQuery::Response *const response) const
-{
-  response->set_submap_version(num_range_data());
-
-  Eigen::Array2i offset;
-  CellLimits limits;
-  probability_grid_.ComputeCroppedLimits(&offset, &limits);
-
-  string cells;
-  for (const Eigen::Array2i &xy_index : XYIndexRangeIterator(limits))
-  {
-    if (probability_grid_.IsKnown(xy_index + offset))
-    {
-      // We would like to add 'delta' but this is not possible using a value and
-      // alpha. We use premultiplied alpha, so when 'delta' is positive we can
-      // add it by setting 'alpha' to zero. If it is negative, we set 'value' to
-      // zero, and use 'alpha' to subtract. This is only correct when the pixel
-      // is currently white, so walls will look too gray. This should be hard to
-      // detect visually for the user, though.
-      const int delta =
-          128 - mapping::ProbabilityToLogOddsInteger(
-                    probability_grid_.GetProbability(xy_index + offset));
-      const uint8 alpha = delta > 0 ? 0 : -delta;
-      const uint8 value = delta > 0 ? delta : 0;
-      cells.push_back(value);
-      cells.push_back((value || alpha) ? alpha : 1);
-    }
-    else
-    {
-      constexpr uint8 kUnknownLogOdds = 0;
-      cells.push_back(static_cast<uint8>(kUnknownLogOdds)); // value
-      cells.push_back(0);                                   // alpha
-    }
-  }
-  mapping::proto::SubmapQuery::Response::SubmapTexture *const texture =
-      response->add_textures();
-  common::FastGzipString(cells, texture->mutable_cells());
-
-  texture->set_width(limits.num_x_cells);
-  texture->set_height(limits.num_y_cells);
-  const double resolution = probability_grid_.limits().resolution();
-  texture->set_resolution(resolution);
-  const double max_x =
-      probability_grid_.limits().max().x() - resolution * offset.y();
-  const double max_y =
-      probability_grid_.limits().max().y() - resolution * offset.x();
-  *texture->mutable_slice_pose() = transform::ToProto(
-      local_pose().inverse() *
-      transform::Rigid3d::Translation(Eigen::Vector3d(max_x, max_y, 0.)));
-}
 
 void Submap::InsertRangeData(const sensor::RangeData &range_data,
                              const RangeDataInserter &range_data_inserter)
@@ -159,12 +94,12 @@ void Submap::Finish()
 }
 
 ActiveSubmaps::ActiveSubmaps(const proto::SubmapsOptions &options)
-    : options_(options),
-      range_data_inserter_(options.range_data_inserter_options())
+: options_(options),
+  range_data_inserter_(options.range_data_inserter_options())
 {
-  // We always want to have at least one likelihood field which we can return,
-  // and will create it at the origin in absence of a better choice.
-  AddSubmap(Eigen::Vector2f::Zero());
+// We always want to have at least one likelihood field which we can return,
+// and will create it at the origin in absence of a better choice.
+AddSubmap(Eigen::Vector2f::Zero());
 }
 
 void ActiveSubmaps::InsertRangeData(const sensor::RangeData &range_data)

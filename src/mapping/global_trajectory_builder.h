@@ -17,66 +17,49 @@
 #ifndef CARTOGRAPHER_MAPPING_GLOBAL_TRAJECTORY_BUILDER_H_
 #define CARTOGRAPHER_MAPPING_GLOBAL_TRAJECTORY_BUILDER_H_
 
-#include "global_trajectory_builder_interface.h"
+#include "src/sensor/point_cloud.h"
+#include "src/sensor/odometry_data.h"
+#include "src/mapping/local_trajectory_builder.h"
 
-namespace cartographer
-{
-namespace mapping
-{
 
-template <typename LocalTrajectoryBuilder,
-          typename LocalTrajectoryBuilderOptions, typename SparsePoseGraph>
-class GlobalTrajectoryBuilder
-    : public mapping::GlobalTrajectoryBuilderInterface
-{
+namespace cartographer {
+namespace mapping {
 
-public:
-  GlobalTrajectoryBuilder(const LocalTrajectoryBuilderOptions &options,
-                          const int trajectory_id,
-                          SparsePoseGraph *const sparse_pose_graph)
-      : trajectory_id_(trajectory_id),
-        sparse_pose_graph_(sparse_pose_graph),
-        local_trajectory_builder_(options) {}
-  ~GlobalTrajectoryBuilder() override {}
+class GlobalTrajectoryBuilder{
+ public:
+  GlobalTrajectoryBuilder(const proto::LocalTrajectoryBuilderOptions &options): local_trajectory_builder_(options) {};
 
-  GlobalTrajectoryBuilder(const GlobalTrajectoryBuilder &) = delete;
-  GlobalTrajectoryBuilder &operator=(const GlobalTrajectoryBuilder &) = delete;
+  ~GlobalTrajectoryBuilder(){};
 
-  const mapping::PoseEstimate &pose_estimate() const override
+  GlobalTrajectoryBuilder(const GlobalTrajectoryBuilder&) = delete;
+  GlobalTrajectoryBuilder& operator=(const GlobalTrajectoryBuilder&) = delete;
+
+  //const mapping::PoseEstimate& pose_estimate() const {
+  //  return local_trajectory_builder_.pose_estimate();
+  //}
+
+  void AddRangefinderData(const double time, const Eigen::Vector3f &origin, const sensor::PointCloud &ranges)
   {
-    return local_trajectory_builder_.pose_estimate();
-  }
-
-  void AddRangefinderData(const double time,
-                          const Eigen::Vector3f &origin,
-                          const sensor::PointCloud &ranges) override
-  {
-    std::unique_ptr<typename LocalTrajectoryBuilder::InsertionResult>
-        insertion_result = local_trajectory_builder_.AddRangeData(
-            time, sensor::RangeData{origin, ranges, {}});
+    auto insertion_result = local_trajectory_builder_.AddRangeData( time, sensor::RangeData{origin, ranges, {}});
     if (insertion_result == nullptr)
     {
       return;
     }
-    sparse_pose_graph_->AddScan(
-        insertion_result->constant_data, insertion_result->pose_observation,
-        trajectory_id_, insertion_result->insertion_submaps);
+    //sparse_pose_graph_->AddScan(
+    //    insertion_result->constant_data, insertion_result->pose_observation,
+    //    trajectory_id_, insertion_result->insertion_submaps);
   }
 
-  void AddSensorData(const sensor::OdometryData &odometry_data) override
-  {
+  void AddSensorData(const sensor::OdometryData& odometry_data){
     local_trajectory_builder_.AddOdometerData(odometry_data);
     //sparse_pose_graph_->AddOdometerData(trajectory_id_, odometry_data);
   }
-private:
-  const int trajectory_id_;
-public:
-  SparsePoseGraph *const sparse_pose_graph_;
-private:
+
+ private:
   LocalTrajectoryBuilder local_trajectory_builder_;
 };
 
-} // namespace mapping
-} // namespace cartographer
+}  // namespace mapping
+}  // namespace cartographer
 
-#endif // CARTOGRAPHER_MAPPING_GLOBAL_TRAJECTORY_BUILDER_H_
+#endif  // CARTOGRAPHER_MAPPING_GLOBAL_TRAJECTORY_BUILDER_H_

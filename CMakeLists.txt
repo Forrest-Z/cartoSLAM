@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 2.8.12)  # Ships with Ubuntu 14.04 (Trusty)
 
 project(carto_slam)
 
+#include(${CMAKE_CURRENT_SOURCE_DIR}/msg/CMakeLists.txt)
+
+#message(FATAL_ERROR ${PROJECT_BINARY_DIR})
+
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -Wall  -O0 -march=native ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall   -O0 -march=native")
@@ -13,9 +17,9 @@ find_package(Ceres REQUIRED COMPONENTS SparseLinearAlgebraLibrary)
 find_package(Eigen3 REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(PCL 1.2 REQUIRED)
-find_package(Lua REQUIRED)
-#set(LUA_INCLUDE_DIR "/usr/local/include/")
-#set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
+#find_package(Lua REQUIRED)
+set(LUA_INCLUDE_DIR "/usr/local/include/")
+set(LUA_LIBRARIES "/usr/local/lib/liblua.a")
 
 add_definitions(-DEIGEN_DONT_ALIGN_STATICALLY)
 
@@ -28,7 +32,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs  message_filters laser_g
 #    CATKIN_DEPENDS roscpp nav_msgs  message_filters laser_geometry  rosbag
 #    DEPENDS EIGEN3
 #  )
-
+#message(FATAL_ERROR  ${CMAKE_CURRENT_SOURCE_DIR} )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${Boost_INCLUDE_DIRS})

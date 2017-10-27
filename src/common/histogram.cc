@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "../common/histogram.h"
+#include "src/common/histogram.h"
 
 #include <algorithm>
 #include <numeric>
 #include <string>
 
-#include "../common/port.h"
+#include "src/common/port.h"
 #include "glog/logging.h"
 
 namespace cartographer {

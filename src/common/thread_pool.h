@@ -22,7 +22,7 @@
 #include <thread>
 #include <vector>
 
-#include "../common/mutex.h"
+#include "src/common/mutex.h"
 
 namespace cartographer {
 namespace common {

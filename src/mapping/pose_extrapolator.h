@@ -20,8 +20,8 @@
 #include <deque>
 #include <memory>
 
-#include "../sensor/odometry_data.h"
-#include "../transform/rigid_transform.h"
+#include "src/sensor/odometry_data.h"
+#include "src/transform/rigid_transform.h"
 
 namespace cartographer {
 namespace mapping {

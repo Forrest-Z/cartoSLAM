@@ -21,9 +21,9 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "src/mapping/proto/trajectory_node.pb.h"
-#include "../sensor/range_data.h"
-#include "../transform/rigid_transform.h"
+//#include "src/mapping/proto/trajectory_node.pb.h"
+#include "src/sensor/range_data.h"
+#include "src/transform/rigid_transform.h"
 
 namespace cartographer {
 namespace mapping {
@@ -39,11 +39,6 @@ struct TrajectoryNode {
     // Used for loop closure in 2D: voxel filtered returns in the
     // 'gravity_alignment' frame.
     sensor::PointCloud filtered_gravity_aligned_point_cloud;
-
-    // Used for loop closure in 3D.
-    sensor::PointCloud high_resolution_point_cloud;
-    sensor::PointCloud low_resolution_point_cloud;
-    Eigen::VectorXf rotational_scan_matcher_histogram;
   };
 
   double time() const { return constant_data->time; }
@@ -56,8 +51,8 @@ struct TrajectoryNode {
   transform::Rigid3d pose;
 };
 
-proto::TrajectoryNode ToProto(const TrajectoryNode::Data& constant_data);
-TrajectoryNode::Data FromProto(const proto::TrajectoryNode& proto);
+//proto::TrajectoryNode ToProto(const TrajectoryNode::Data& constant_data);
+//TrajectoryNode::Data FromProto(const proto::TrajectoryNode& proto);
 
 }  // namespace mapping
 }  // namespace cartographer

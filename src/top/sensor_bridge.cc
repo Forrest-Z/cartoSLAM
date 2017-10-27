@@ -16,9 +16,9 @@
 
 #include "sensor_bridge.h"
 
-#include "msg_conversion.h"
+#include "src/top/msg_conversion.h"
 
-#include "../common/make_unique.h"
+#include "src/common/make_unique.h"
 
 namespace cartographer_ros {
 
@@ -40,17 +40,16 @@ void SensorBridge::HandleLaserScanMessage(const sensor_msgs::LaserScan::ConstPtr
     auto scan_data = ::cartographer_ros::ToPointCloudWithIntensities(*msg);
     double timestamp = msg->header.stamp.toSec();
     Eigen::Vector3f origin = Eigen::Vector3f::Zero();
-    p_global_trajectory_builder_->AddRangefinderData(timestamp, origin, scan_data.points);
+    global_trajectory_builder_ptr_->AddRangefinderData(timestamp, origin, scan_data.points);
 
 }
 
 void SensorBridge::HandleOdometryMessage(const nav_msgs::Odometry::ConstPtr& msg) 
 {
   auto odom_data = ToOdometryData(msg);
-  //if (odometry_data != nullptr) {
-  //  trajectory_builder_->AddOdometerData(sensor_id, odometry_data->time,
-  //                                       odometry_data->pose);
-  //}
+  if (odom_data != nullptr) {
+    global_trajectory_builder_ptr_->AddSensorData(*odom_data);
+  }
 }
 
 

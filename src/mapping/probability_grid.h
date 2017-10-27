@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "../common/math.h"
-#include "../common/port.h"
+#include "src/common/math.h"
+#include "src/common/port.h"
 #include "probability_values.h"
-#include "../mapping/map_limits.h"
-#include "src/mapping/proto/probability_grid.pb.h"
-#include "../mapping/xy_index.h"
+#include "src/mapping/map_limits.h"
+//#include "src/mapping/proto/probability_grid.pb.h"
+#include "src/mapping/xy_index.h"
 #include "glog/logging.h"
 
 namespace cartographer {
@@ -45,19 +45,6 @@ class ProbabilityGrid {
                    limits_.cell_limits().num_y_cells,
                mapping::kUnknownProbabilityValue) {}
 
-  explicit ProbabilityGrid(const proto::ProbabilityGrid& proto)
-      : limits_(proto.limits()), cells_() {
-    if (proto.has_min_x()) {
-      known_cells_box_ =
-          Eigen::AlignedBox2i(Eigen::Vector2i(proto.min_x(), proto.min_y()),
-                              Eigen::Vector2i(proto.max_x(), proto.max_y()));
-    }
-    cells_.reserve(proto.cells_size());
-    for (const auto cell : proto.cells()) {
-      CHECK_LE(cell, std::numeric_limits<uint16>::max());
-      cells_.push_back(cell);
-    }
-  }
 
   // Returns the limits of this ProbabilityGrid.
   const MapLimits& limits() const { return limits_; }
@@ -134,9 +121,11 @@ class ProbabilityGrid {
   // Grows the map as necessary to include 'point'. This changes the meaning of
   // these coordinates going forward. This method must be called immediately
   // after 'FinishUpdate', before any calls to 'ApplyLookupTable'.
-  void GrowLimits(const Eigen::Vector2f& point) {
+  void GrowLimits(const Eigen::Vector2f &point)
+  {
     CHECK(update_indices_.empty());
-    while (!limits_.Contains(limits_.GetCellIndex(point))) {
+    while (!limits_.Contains(limits_.GetCellIndex(point)))
+    {
       const int x_offset = limits_.cell_limits().num_x_cells / 2;
       const int y_offset = limits_.cell_limits().num_y_cells / 2;
       const MapLimits new_limits(
@@ -151,37 +140,23 @@ class ProbabilityGrid {
                            new_limits.cell_limits().num_y_cells;
       std::vector<uint16> new_cells(new_size,
                                     mapping::kUnknownProbabilityValue);
-      for (int i = 0; i < limits_.cell_limits().num_y_cells; ++i) {
-        for (int j = 0; j < limits_.cell_limits().num_x_cells; ++j) {
+      for (int i = 0; i < limits_.cell_limits().num_y_cells; ++i)
+      {
+        for (int j = 0; j < limits_.cell_limits().num_x_cells; ++j)
+        {
           new_cells[offset + j + i * stride] =
               cells_[j + i * limits_.cell_limits().num_x_cells];
         }
       }
       cells_ = new_cells;
       limits_ = new_limits;
-      if (!known_cells_box_.isEmpty()) {
+      if (!known_cells_box_.isEmpty())
+      {
         known_cells_box_.translate(Eigen::Vector2i(x_offset, y_offset));
       }
     }
   }
 
-  proto::ProbabilityGrid ToProto() const {
-    proto::ProbabilityGrid result;
-    *result.mutable_limits() = cartographer::mapping::ToProto(limits_);
-    result.mutable_cells()->Reserve(cells_.size());
-    for (const auto cell : cells_) {
-      result.mutable_cells()->Add(cell);
-    }
-    CHECK(update_indices_.empty()) << "Serializing a grid during an update is "
-                                      "not supported. Finish the update first.";
-    if (!known_cells_box_.isEmpty()) {
-      result.set_max_x(known_cells_box_.max().x());
-      result.set_max_y(known_cells_box_.max().y());
-      result.set_min_x(known_cells_box_.min().x());
-      result.set_min_y(known_cells_box_.min().y());
-    }
-    return result;
-  }
 
  private:
   // Converts a 'cell_index' into an index into 'cells_'.

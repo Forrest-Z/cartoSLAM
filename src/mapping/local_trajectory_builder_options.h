@@ -17,13 +17,13 @@
 #ifndef CARTOGRAPHER_MAPPING_2D_LOCAL_TRAJECTORY_BUILDER_OPTIONS_H_
 #define CARTOGRAPHER_MAPPING_2D_LOCAL_TRAJECTORY_BUILDER_OPTIONS_H_
 
-#include "../common/lua_parameter_dictionary.h"
+#include "src/common/lua_parameter_dictionary.h"
 #include "src/mapping/proto/local_trajectory_builder_options.pb.h"
 
 namespace cartographer {
 namespace mapping {
 
-proto::LocalTrajectoryBuilderOptions CreateLocalTrajectoryBuilderOptions();
+proto::LocalTrajectoryBuilderOptions CreateLocalTrajectoryBuilderOptions(common::LuaParameterDictionary* parameter_dictionary);
 
 }  // namespace mapping_2d
 }  // namespace cartographer

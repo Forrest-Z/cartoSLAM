@@ -21,7 +21,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "../common/math.h"
+#include "src/common/math.h"
 #include "src/transform/proto/transform.pb.h"
 #include "rigid_transform.h"
 

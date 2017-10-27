@@ -197,7 +197,7 @@ LuaParameterDictionary::LuaParameterDictionary(
 
 LuaParameterDictionary::~LuaParameterDictionary() {
   if (reference_count_ == ReferenceCount::YES) {
-    CheckAllKeysWereUsedExactlyOnceAndReset();
+    //CheckAllKeysWereUsedExactlyOnceAndReset();
   }
   if (index_into_reference_table_ > 0) {
     luaL_unref(L_, LUA_REGISTRYINDEX, index_into_reference_table_);
@@ -284,7 +284,8 @@ std::unique_ptr<LuaParameterDictionary> LuaParameterDictionary::GetDictionary(
     const string& key) {
   CheckHasKeyAndReference(key);
   GetValueFromLuaTable(L_, key);
-  return PopDictionary(reference_count_);
+  auto p = PopDictionary(reference_count_);
+  return p;
 }
 
 std::unique_ptr<LuaParameterDictionary> LuaParameterDictionary::PopDictionary(

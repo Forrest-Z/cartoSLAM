@@ -19,11 +19,11 @@
 
 #include <vector>
 
-#include "../common/port.h"
-#include "../mapping/probability_grid.h"
-#include "../sensor/point_cloud.h"
-#include "../sensor/range_data.h"
-#include "../transform/transform.h"
+#include "src/common/port.h"
+#include "src/mapping/probability_grid.h"
+#include "src/sensor/point_cloud.h"
+#include "src/sensor/range_data.h"
+#include "src/transform/transform.h"
 
 namespace cartographer {
 namespace mapping {

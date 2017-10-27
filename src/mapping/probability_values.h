@@ -20,8 +20,8 @@
 #include <cmath>
 #include <vector>
 
-#include "../common/math.h"
-#include "../common/port.h"
+#include "src/common/math.h"
+#include "src/common/port.h"
 #include "glog/logging.h"
 
 namespace cartographer {
