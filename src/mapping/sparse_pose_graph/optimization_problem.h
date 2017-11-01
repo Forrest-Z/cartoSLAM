@@ -27,7 +27,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "src/common/port.h"
-#include "src/mapping/sparse_pose_graph.h"
+#include "src/mapping/sparse_pose_graph_base.h"
 #include "src/mapping/sparse_pose_graph/proto/optimization_problem_options.pb.h"
 #include "src/sensor/odometry_data.h"
 #include "src/transform/transform_interpolation_buffer.h"

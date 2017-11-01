@@ -135,7 +135,7 @@ PrecomputationGrid::PrecomputationGrid(
   for (int x = 0; x != wide_limits_.num_x_cells; ++x) {
     SlidingWindowMaximum current_values;
     current_values.AddValue(intermediate[x]);
-    for (int y = -width + 1; y != 0; ++y) {
+    for (int y = -width + 1; y != 0; ++y){
       cells_[x + (y + width - 1) * stride] =
           ComputeCellValue(current_values.GetMaximum());
       if (y + width < limits.num_y_cells) {

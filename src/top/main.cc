@@ -12,6 +12,66 @@
 #include "src/mapping/local_trajectory_builder_options.h"
 #include "src/mapping/submaps.h"
 
+class Publisher
+{
+  public:
+	explicit Publisher(std::shared_ptr<::cartographer::mapping::GlobalTrajectoryBuilder>
+						   p_global_trajectory_builder,
+					   double map_pub_period) : p_global_trajectory_builder_(p_global_trajectory_builder), map_pub_period_(map_pub_period)
+	{
+		mapPublisher_ = node_.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
+	};
+
+	void pcd()
+	{
+		ros::Rate r(1.0 / map_pub_period_);
+		::ros::NodeHandle node_handle;
+		::ros::Publisher pcd_publisher;
+		pcd_publisher = node_handle.advertise<sensor_msgs::PointCloud2>("carto_pcd", 1);
+
+		while (ros::ok())
+		{
+			
+			const auto all_submap_data = p_global_trajectory_builder_->GetAllSubmapData();
+			if (!(all_submap_data.size() == 1 && all_submap_data[0].size() > 0))
+				continue;
+			auto grid = all_submap_data[0][0].submap->probability_grid();
+			std::vector<int8_t> &data = map_.map.data;
+
+			map_.map.info.origin.position.x = 0;
+			map_.map.info.origin.position.y = 0;
+			map_.map.info.origin.orientation.w = 1.0;
+
+			map_.map.info.resolution = grid.limits().resolution();
+
+			map_.map.info.width = grid.limits().cell_limits().num_x_cells;
+			map_.map.info.height = grid.limits().cell_limits().num_y_cells;
+
+			map_.map.header.frame_id = "map";
+			map_.map.data.resize(map_.map.info.width * map_.map.info.height);
+			memset(&map_.map.data[0], 100, sizeof(int8_t) * map_.map.data.size());
+			map_.map.header.stamp = ros::Time::now();
+			for (int y = 0; y < grid.limits().cell_limits().num_y_cells; ++y)
+			{
+				for (int x = 0; x < grid.limits().cell_limits().num_x_cells; ++x)
+				{
+					data[y * grid.limits().cell_limits().num_y_cells + x] =
+						grid.GetProbability(Eigen::Array2i(x, y)) * 100;
+				}
+			}
+			mapPublisher_.publish(map_.map);
+			ros::spinOnce();
+			r.sleep();
+		}
+	}
+
+  private:
+	std::shared_ptr<::cartographer::mapping::GlobalTrajectoryBuilder> p_global_trajectory_builder_;
+	double map_pub_period_;
+	nav_msgs::GetMap::Response map_;
+	ros::Publisher mapPublisher_;
+	ros::NodeHandle node_;
+};
 
 int main(int argc, char **argv)
 {
@@ -26,10 +86,14 @@ int main(int argc, char **argv)
 	//auto sub = parameter_dictionary.GetDictionary("trajectory_builder").get();
 	//auto sub2= sub->GetDictionary("trajectory_builder_2d").get();
 	auto local_trajectory_builder_options = ::cartographer::mapping::CreateLocalTrajectoryBuilderOptions(parameter_dictionary.GetDictionary("trajectory_builder").get()->GetDictionary("trajectory_builder_2d").get());
-
-	auto golbal_trajectory_builder_ptr = std::make_shared<::cartographer::mapping::GlobalTrajectoryBuilder>(local_trajectory_builder_options);
+	auto sparse_pose_graph_options        = ::cartographer::mapping::CreateSparsePoseGraphOptions(parameter_dictionary.GetDictionary("map_builder").get()->GetDictionary("sparse_pose_graph").get());
+	auto golbal_trajectory_builder_ptr = std::make_shared<::cartographer::mapping::GlobalTrajectoryBuilder>(local_trajectory_builder_options, sparse_pose_graph_options);
 	::cartographer_ros::SensorBridge sensor_bridge(golbal_trajectory_builder_ptr);
 	
+
+	Publisher pub = Publisher(golbal_trajectory_builder_ptr, 0.5);
+	new std::thread(&Publisher::pcd, &pub);
+
 	//::cartographer::mapping::ProbabilityGrid probability_grid(::cartographer::mapping::MapLimits(1., Eigen::Vector2d(1., 2.), ::cartographer::mapping::CellLimits(2, 2)));
 	while (ros::ok())
 	{

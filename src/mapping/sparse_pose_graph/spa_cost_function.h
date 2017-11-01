@@ -22,7 +22,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "src/common/math.h"
-#include "src/mapping/sparse_pose_graph.h"
+#include "src/mapping/sparse_pose_graph_base.h"
 #include "src/transform/rigid_transform.h"
 #include "src/transform/transform.h"
 #include "ceres/ceres.h"

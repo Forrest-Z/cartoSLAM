@@ -38,7 +38,6 @@
 
 
 #include "nav_msgs/GetMap.h"
-#include <ros/ros.h>
 
 namespace cartographer
 {
@@ -102,8 +101,6 @@ class LocalTrajectoryBuilder
 
 
     nav_msgs::GetMap::Response map_;
-    ros::Publisher mapPublisher_;
-    ros::NodeHandle node_;
     
 
 };

@@ -20,14 +20,20 @@
 #include "src/sensor/point_cloud.h"
 #include "src/sensor/odometry_data.h"
 #include "src/mapping/local_trajectory_builder.h"
-
+#include "src/mapping/sparse_pose_graph.h"
+#include "src/common/make_unique.h"
 
 namespace cartographer {
 namespace mapping {
 
 class GlobalTrajectoryBuilder{
  public:
-  GlobalTrajectoryBuilder(const proto::LocalTrajectoryBuilderOptions &options): local_trajectory_builder_(options) {};
+  GlobalTrajectoryBuilder(const proto::LocalTrajectoryBuilderOptions &local_trajectory_options,
+     const proto::SparsePoseGraphOptions &sparse_pose_graphe_options):
+    thread_pool_(4)
+   ,local_trajectory_builder_(local_trajectory_options)
+   ,sparse_pose_graph_2d_(std::move(common::make_unique<SparsePoseGraph2D>(sparse_pose_graphe_options ,&thread_pool_))) 
+   {};
 
   ~GlobalTrajectoryBuilder(){};
 
@@ -45,18 +51,25 @@ class GlobalTrajectoryBuilder{
     {
       return;
     }
-    //sparse_pose_graph_->AddScan(
-    //    insertion_result->constant_data, insertion_result->pose_observation,
-    //    trajectory_id_, insertion_result->insertion_submaps);
+    sparse_pose_graph_2d_->AddScan(
+        insertion_result->constant_data, insertion_result->pose_observation,
+        0, insertion_result->insertion_submaps);
   }
 
   void AddSensorData(const sensor::OdometryData& odometry_data){
     local_trajectory_builder_.AddOdometerData(odometry_data);
-    //sparse_pose_graph_->AddOdometerData(trajectory_id_, odometry_data);
+    sparse_pose_graph_2d_->AddOdometerData(0, odometry_data);
   }
 
- private:
+  std::vector<std::vector<mapping::SparsePoseGraph::SubmapData>> GetAllSubmapData()
+  {
+    return sparse_pose_graph_2d_->GetAllSubmapData();
+  }
+
+private:
+  common::ThreadPool thread_pool_;
   LocalTrajectoryBuilder local_trajectory_builder_;
+  std::unique_ptr<SparsePoseGraph2D> sparse_pose_graph_2d_;
 };
 
 }  // namespace mapping

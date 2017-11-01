@@ -36,7 +36,6 @@ LocalTrajectoryBuilder::LocalTrajectoryBuilder(const proto::LocalTrajectoryBuild
         options_.real_time_correlative_scan_matcher_options())
     ,ceres_scan_matcher_(options_.ceres_scan_matcher_options())
 {
-    mapPublisher_ = node_.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
 }
 
 LocalTrajectoryBuilder::~LocalTrajectoryBuilder() {}
@@ -92,33 +91,6 @@ std::unique_ptr<LocalTrajectoryBuilder::InsertionResult> LocalTrajectoryBuilder:
                            transform::Embed3D(pose_estimate_2d.cast<float>())));
 
 
-    
-    auto grid = active_submaps_.submaps().front()->probability_grid();
-    std::vector<int8_t> &data = map_.map.data;
-    map_.map.info.origin.position.x = 0;
-    map_.map.info.origin.position.y = 0;
-    map_.map.info.origin.orientation.w = 1.0;
-    map_.map.info.resolution = grid.limits().resolution();
-
-    map_.map.info.width = grid.limits().cell_limits().num_x_cells;
-    map_.map.info.height = grid.limits().cell_limits().num_y_cells;
-
-    map_.map.header.frame_id = "map";
-    map_.map.data.resize(map_.map.info.width * map_.map.info.height);
-    memset(&map_.map.data[0], 100, sizeof(int8_t) * map_.map.data.size());
-    map_.map.header.stamp = ros::Time::now();
-    for (int y = 0; y < grid.limits().cell_limits().num_y_cells; ++y)
-    {
-        for (int x = 0; x < grid.limits().cell_limits().num_x_cells; ++x)
-        {
-            data[y * grid.limits().cell_limits().num_y_cells + x] =
-                grid.GetProbability(Eigen::Array2i(x, y)) * 100;
-        }
-    }
-    mapPublisher_.publish(map_.map);
-    ros::spinOnce();
-    //printf("map out!\n");
-
     return common::make_unique<InsertionResult>(InsertionResult{
         std::make_shared<const mapping::TrajectoryNode::Data>(
             mapping::TrajectoryNode::Data{
@@ -128,8 +100,6 @@ std::unique_ptr<LocalTrajectoryBuilder::InsertionResult> LocalTrajectoryBuilder:
             }),
         pose_estimate, std::move(insertion_submaps)});
 
-
-    //return nullptr;
 }
 
 sensor::RangeData LocalTrajectoryBuilder::TransformAndFilterRangeData(

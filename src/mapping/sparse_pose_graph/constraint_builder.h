@@ -38,7 +38,7 @@
 //#include "src/mapping_3d/scan_matching/fast_correlative_scan_matcher.h"
 #include "src/sensor/point_cloud.h"
 //#include "src/sensor/voxel_filter.h"
-#include "src/mapping/sparse_pose_graph.h"
+#include "src/mapping/sparse_pose_graph_base.h"
 
 
 namespace cartographer {
