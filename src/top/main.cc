@@ -31,32 +31,61 @@ class Publisher
 
 		while (ros::ok())
 		{
-			
+
 			const auto all_submap_data = p_global_trajectory_builder_->GetAllSubmapData();
+
 			if (!(all_submap_data.size() == 1 && all_submap_data[0].size() > 0))
 				continue;
-			auto grid = all_submap_data[0][0].submap->probability_grid();
+
+			//std::cout<<grid.limits().max().x()<<","<<grid.limits().max().y()<<std::endl;
+			//std::cout<<offset.x() <<","<<offset.y()<<std::endl;
+				
 			std::vector<int8_t> &data = map_.map.data;
 
 			map_.map.info.origin.position.x = 0;
 			map_.map.info.origin.position.y = 0;
-			map_.map.info.origin.orientation.w = 1.0;
-
-			map_.map.info.resolution = grid.limits().resolution();
-
-			map_.map.info.width = grid.limits().cell_limits().num_x_cells;
-			map_.map.info.height = grid.limits().cell_limits().num_y_cells;
+		  	map_.map.info.origin.orientation.w = 1;
+			map_.map.info.resolution = 0.05;
+			map_.map.info.width = 1000;
+			map_.map.info.height = 1000;
+			//map_.map.info.width = limits.num_x_cells;
+			//map_.map.info.height = limits.num_y_cells;
 
 			map_.map.header.frame_id = "map";
 			map_.map.data.resize(map_.map.info.width * map_.map.info.height);
-			memset(&map_.map.data[0], 100, sizeof(int8_t) * map_.map.data.size());
 			map_.map.header.stamp = ros::Time::now();
-			for (int y = 0; y < grid.limits().cell_limits().num_y_cells; ++y)
+			memset(&map_.map.data[0], 0, sizeof(int8_t) * map_.map.data.size());
+			for (::cartographer::mapping::SparsePoseGraph::SubmapData m : all_submap_data[0])
 			{
-				for (int x = 0; x < grid.limits().cell_limits().num_x_cells; ++x)
+				Eigen::Array2i offset;
+				::cartographer::mapping::CellLimits limits;
+				auto grid = m.submap->probability_grid();
+				grid.ComputeCroppedLimits(&offset, &limits);
+
+				//std::cout<<m.submap->local_pose().translation().x()<<","<<m.submap->local_pose().translation().y()<<std::endl;
+
+				for (const Eigen::Array2i &xy_index : ::cartographer::mapping::XYIndexRangeIterator(limits))
 				{
-					data[y * grid.limits().cell_limits().num_y_cells + x] =
-						grid.GetProbability(Eigen::Array2i(x, y)) * 100;
+
+					if (grid.IsKnown(xy_index + offset))
+					{
+						double x = grid.limits().max()[1] - (offset.x() + xy_index.x() + 0.5) * grid.limits().resolution();
+						double y = grid.limits().max()[0] - (offset.y() + xy_index.y() + 0.5) * grid.limits().resolution();
+
+						
+						int x_map = x / grid.limits().resolution() + map_.map.info.width / 2;
+						int y_map = y / grid.limits().resolution() + map_.map.info.height /2;
+
+						const double p = grid.GetProbability(xy_index + offset);
+						if(data[y_map * map_.map.info.width + x_map] == 0){
+							int map_state = 0;
+							if (p > 0.51)
+								map_state = p * 100;
+							else if (p < 0.49)
+								map_state = -(1-p) * 100;
+							data[y_map * map_.map.info.width + x_map] = map_state;
+						}
+					}
 				}
 			}
 			mapPublisher_.publish(map_.map);
