@@ -170,6 +170,14 @@ void OptimizationProblem::Solve(const std::vector<Constraint>& constraints,
   }
   // Add cost functions for intra- and inter-submap constraints.
   for (const Constraint& constraint : constraints) {
+    //transform::Rigid2d s_p = submap_data_[0][constraint.submap_id.submap_index].pose;
+    //transform::Rigid2d c_p = node_data_[0][constraint.node_id.node_index].pose;
+    //transform::Rigid2d diff = s_p.inverse() * c_p;
+    //transform::Rigid2d zbar_ij = transform::Project2D(constraint.pose.zbar_ij);
+    //transform::Rigid2d error = zbar_ij.inverse() * diff;
+    //std::cout<<error<<std::endl;
+
+
     problem.AddResidualBlock(
         new ceres::AutoDiffCostFunction<SpaCostFunction, 3, 3, 3>(
             new SpaCostFunction(constraint.pose)),

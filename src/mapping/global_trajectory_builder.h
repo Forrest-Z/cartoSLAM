@@ -47,6 +47,8 @@ class GlobalTrajectoryBuilder{
   void AddRangefinderData(const double time, const Eigen::Vector3f &origin, const sensor::PointCloud &ranges)
   {
     auto insertion_result = local_trajectory_builder_.AddRangeData( time, sensor::RangeData{origin, ranges, {}});
+    //std::cout<<"All pending works:" << sparse_pose_graph_2d_->constraint_builder_.GetAllPendingWork() <<std::endl;
+    
     if (insertion_result == nullptr)
     {
       return;
@@ -61,10 +63,10 @@ class GlobalTrajectoryBuilder{
     sparse_pose_graph_2d_->AddOdometerData(0, odometry_data);
   }
 
-  std::vector<std::vector<mapping::SparsePoseGraph::SubmapData>> GetAllSubmapData()
-  {
-    return sparse_pose_graph_2d_->GetAllSubmapData();
-  }
+
+  std::unique_ptr<SparsePoseGraph2D>& sparse_pose_graph() { return sparse_pose_graph_2d_; }
+  
+
 
 private:
   common::ThreadPool thread_pool_;
